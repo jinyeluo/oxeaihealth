@@ -9,8 +9,14 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.PeriodicWorkRequest;
+import androidx.work.WorkManager;
 
 import com.oxeai.health.databinding.ActivityMainBinding;
+import com.oxeai.health.worker.HealthDataWorker;
+
+import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
 {
@@ -32,6 +38,11 @@ public class MainActivity extends AppCompatActivity
       NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
       NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
       NavigationUI.setupWithNavController(binding.navView, navController);
+
+      WorkManager workManager = WorkManager.getInstance(this);
+      PeriodicWorkRequest healthDataWorkRequest = new PeriodicWorkRequest.Builder(HealthDataWorker.class, 1, TimeUnit.HOURS)
+              .build();
+      workManager.enqueueUniquePeriodicWork("HealthDataWorker", ExistingPeriodicWorkPolicy.KEEP, healthDataWorkRequest);
    }
 
 }
