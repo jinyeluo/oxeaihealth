@@ -12,10 +12,18 @@ import androidx.navigation.ui.NavigationUI;
 import androidx.work.ExistingPeriodicWorkPolicy;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.health.connect.client.permission.HealthPermission;
+import androidx.health.connect.client.records.HeartRateRecord;
+import androidx.health.connect.client.records.StepsRecord;
+
 
 import com.oxeai.health.databinding.ActivityMainBinding;
 import com.oxeai.health.worker.HealthDataWorker;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends AppCompatActivity
@@ -42,7 +50,28 @@ public class MainActivity extends AppCompatActivity
       WorkManager workManager = WorkManager.getInstance(this);
       PeriodicWorkRequest healthDataWorkRequest = new PeriodicWorkRequest.Builder(HealthDataWorker.class, 1, TimeUnit.HOURS)
               .build();
-      workManager.enqueueUniquePeriodicWork("HealthDataWorker", ExistingPeriodicWorkPolicy.KEEP, healthDataWorkRequest);
+      workManager.enqueueUniquePeriodicWork("HealthDataWorker", ExistingPeriodicWork-Policy.KEEP, healthDataWorkRequest);
+
+      requestHealthConnectPermissions();
    }
 
+   private void requestHealthConnectPermissions() {
+      // TODO- check if permissions are already granted before requesting
+      // TODO- handle the case where the user denies permissions
+      ActivityResultLauncher<String[]> requestPermissionActivityContract = registerForActivityResult(
+              new ActivityResultContracts.RequestMultiplePermissions(),
+              result -> {
+                 if (result.containsValue(false)) {
+                    // Permissions denied
+                 } else {
+                    // Permissions granted
+                 }
+              });
+
+      Set<String> permissions = new HashSet<>();
+      permissions.add(HealthPermission.getReadPermission(StepsRecord.class));
+      permissions.add(HealthPermission.getReadPermission(HeartRateRecord.class));
+
+      requestPermissionActivityContract.launch(permissions.toArray(new String[0]));
+   }
 }

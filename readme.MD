@@ -2,7 +2,7 @@ This application is to pull health data from Google Health and archive the data 
 
 ## Background Data Aggregation
 
-This application features a background job that runs once per hour to aggregate health data from Google Health and save it to a local file. This is implemented using Android's `WorkManager`. The aggregated data is stored in a file named `health_data.txt` in the application's internal storage.
+This application features a background job that runs once per hour to aggregate health data from Google Health and save it to a local file. This is implemented using Android's `WorkManager`. The `HealthDataWorker` connects to the Google Health Connect API to fetch the user's heart rate and step count data for the last hour. The aggregated data is stored in a file named `health_data.txt` in the application's internal storage.
 
 ## API Integration
 
