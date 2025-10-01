@@ -33,6 +33,7 @@ public class HealthDataWorker extends Worker {
 
         if (healthData != null) {
             saveDataToFile(healthData);
+            sendDataToApi(healthData);
             return Result.success();
         } else {
             return Result.failure();
@@ -58,5 +59,12 @@ public class HealthDataWorker extends Worker {
         } catch (IOException e) {
             Log.e(TAG, "Error saving health data to file", e);
         }
+    }
+
+    private void sendDataToApi(String data) {
+        // In a real application, you would use a networking library like Retrofit or Volley
+        // to send the data to a secure API endpoint.
+        Log.d(TAG, "Sending data to API: " + data);
+        // Placeholder for API call
     }
 }
