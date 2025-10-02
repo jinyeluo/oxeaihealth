@@ -6,9 +6,11 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestMultiple
 import androidx.appcompat.app.AppCompatActivity
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.BodyFatRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.LeanBodyMassRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
@@ -72,6 +74,8 @@ class MainActivity : AppCompatActivity() {
         permissions.add(HealthPermission.getReadPermission(DistanceRecord::class))
         permissions.add(HealthPermission.getReadPermission(SpeedRecord::class))
         permissions.add(HealthPermission.getReadPermission(Vo2MaxRecord::class))
+        permissions.add(HealthPermission.getReadPermission(BodyFatRecord::class))
+        permissions.add(HealthPermission.getReadPermission(LeanBodyMassRecord::class))
 
         requestPermissionActivityContract.launch(permissions.toTypedArray())
     }
