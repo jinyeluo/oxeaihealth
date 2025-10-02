@@ -24,7 +24,6 @@ import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.OxygenSaturationRecord
 import androidx.health.connect.client.records.PowerRecord
 import androidx.health.connect.client.records.RespiratoryRateRecord
-import androidx.health.connect.client.records.SexualActivityRecord
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
@@ -107,7 +106,6 @@ class MainActivity : AppCompatActivity() {
         permissions.add(HealthPermission.getReadPermission(SleepSessionRecord::class))
         permissions.add(HealthPermission.getReadPermission(MenstruationFlowRecord::class))
         permissions.add(HealthPermission.getReadPermission(IntermenstrualBleedingRecord::class))
-        permissions.add(HealthPermission.getReadPermission(SexualActivityRecord::class))
 
         requestPermissionActivityContract.launch(permissions.toTypedArray())
     }

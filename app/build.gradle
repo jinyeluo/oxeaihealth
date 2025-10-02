@@ -1,7 +1,6 @@
 plugins {
    alias(libs.plugins.android.application)
    alias(libs.plugins.kotlin.android)
-//   id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
 android {
@@ -48,6 +47,15 @@ dependencies {
    implementation libs.health.connect
    implementation libs.play.services.auth
    implementation libs.core.ktx
+   implementation(libs.mongodb.driver.kotlin.coroutine)
+   implementation libs.bson
+
+   // Kotlinx Serialization
+   implementation(libs.kotlinx.serialization.json)
+
+   // BSON Kotlinx Serialization (bridges MongoDB and kotlinx.serialization)
+   implementation(libs.bson.kotlinx)
+
    testImplementation libs.junit
    androidTestImplementation libs.ext.junit
    androidTestImplementation libs.espresso.core
