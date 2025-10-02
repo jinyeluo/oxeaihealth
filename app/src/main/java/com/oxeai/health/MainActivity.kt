@@ -6,15 +6,31 @@ import androidx.activity.result.contract.ActivityResultContracts.RequestMultiple
 import androidx.appcompat.app.AppCompatActivity
 import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.BasalMetabolicRateRecord
+import androidx.health.connect.client.records.BloodGlucoseRecord
+import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.BodyFatRecord
+import androidx.health.connect.client.records.BodyTemperatureRecord
+import androidx.health.connect.client.records.BoneMassRecord
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.HeightRecord
+import androidx.health.connect.client.records.HydrationRecord
+import androidx.health.connect.client.records.IntermenstrualBleedingRecord
 import androidx.health.connect.client.records.LeanBodyMassRecord
+import androidx.health.connect.client.records.MenstruationFlowRecord
+import androidx.health.connect.client.records.NutritionRecord
+import androidx.health.connect.client.records.OxygenSaturationRecord
+import androidx.health.connect.client.records.PowerRecord
+import androidx.health.connect.client.records.RespiratoryRateRecord
+import androidx.health.connect.client.records.SexualActivityRecord
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
 import androidx.health.connect.client.records.Vo2MaxRecord
+import androidx.health.connect.client.records.WeightRecord
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
@@ -76,6 +92,22 @@ class MainActivity : AppCompatActivity() {
         permissions.add(HealthPermission.getReadPermission(Vo2MaxRecord::class))
         permissions.add(HealthPermission.getReadPermission(BodyFatRecord::class))
         permissions.add(HealthPermission.getReadPermission(LeanBodyMassRecord::class))
+        permissions.add(HealthPermission.getReadPermission(WeightRecord::class))
+        permissions.add(HealthPermission.getReadPermission(HeightRecord::class))
+        permissions.add(HealthPermission.getReadPermission(BoneMassRecord::class))
+        permissions.add(HealthPermission.getReadPermission(BloodPressureRecord::class))
+        permissions.add(HealthPermission.getReadPermission(BloodGlucoseRecord::class))
+        permissions.add(HealthPermission.getReadPermission(BodyTemperatureRecord::class))
+        permissions.add(HealthPermission.getReadPermission(OxygenSaturationRecord::class))
+        permissions.add(HealthPermission.getReadPermission(RespiratoryRateRecord::class))
+        permissions.add(HealthPermission.getReadPermission(HydrationRecord::class))
+        permissions.add(HealthPermission.getReadPermission(NutritionRecord::class))
+        permissions.add(HealthPermission.getReadPermission(BasalMetabolicRateRecord::class))
+        permissions.add(HealthPermission.getReadPermission(PowerRecord::class))
+        permissions.add(HealthPermission.getReadPermission(SleepSessionRecord::class))
+        permissions.add(HealthPermission.getReadPermission(MenstruationFlowRecord::class))
+        permissions.add(HealthPermission.getReadPermission(IntermenstrualBleedingRecord::class))
+        permissions.add(HealthPermission.getReadPermission(SexualActivityRecord::class))
 
         requestPermissionActivityContract.launch(permissions.toTypedArray())
     }

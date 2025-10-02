@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.BasalMetabolicRateRecord
 import androidx.health.connect.client.records.BloodGlucoseRecord
 import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.records.BodyFatRecord
@@ -15,10 +16,15 @@ import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.records.HydrationRecord
+import androidx.health.connect.client.records.IntermenstrualBleedingRecord
 import androidx.health.connect.client.records.LeanBodyMassRecord
+import androidx.health.connect.client.records.MenstruationFlowRecord
 import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.records.OxygenSaturationRecord
+import androidx.health.connect.client.records.PowerRecord
 import androidx.health.connect.client.records.RespiratoryRateRecord
+import androidx.health.connect.client.records.SexualActivityRecord
+import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
@@ -258,12 +264,67 @@ class HealthDataWorker(context: Context, workerParams: WorkerParameters) : Liste
             }
             val totalNutritionCalories = nutritionRecords.sumOf { it.energy?.inCalories ?: 0.0 }
 
+            val basalMetabolicRateRequest: ReadRecordsRequest<BasalMetabolicRateRecord> = ReadRecordsRequest(
+                BasalMetabolicRateRecord::class,
+                between(startTime, endTime)
+            )
+            val basalMetabolicRateRecords: List<BasalMetabolicRateRecord> = runBlocking {
+                healthConnectClient.readRecords(basalMetabolicRateRequest).records
+            }
+            val avgBasalMetabolicRate = basalMetabolicRateRecords.map { it.basalMetabolicRate.inKilocaloriesPerDay }.average()
+
+            val powerRequest: ReadRecordsRequest<PowerRecord> = ReadRecordsRequest(
+                PowerRecord::class,
+                between(startTime, endTime)
+            )
+            val powerRecords: List<PowerRecord> = runBlocking {
+                healthConnectClient.readRecords(powerRequest).records
+            }
+            val avgPower = powerRecords.flatMap { it.samples }.map { it.power.inWatts }.average()
+
+            val sleepSessionRequest: ReadRecordsRequest<SleepSessionRecord> = ReadRecordsRequest(
+                SleepSessionRecord::class,
+                between(startTime, endTime)
+            )
+            val sleepSessionRecords: List<SleepSessionRecord> = runBlocking {
+                healthConnectClient.readRecords(sleepSessionRequest).records
+            }
+            val totalSleepDuration = sleepSessionRecords.sumOf { it.endTime.epochSecond - it.startTime.epochSecond }
+
+            val menstruationRequest: ReadRecordsRequest<MenstruationFlowRecord> = ReadRecordsRequest(
+                MenstruationFlowRecord::class,
+                between(startTime, endTime)
+            )
+            val menstruationRecords: List<MenstruationFlowRecord> = runBlocking {
+                healthConnectClient.readRecords(menstruationRequest).records
+            }
+            val menstruationData = menstruationRecords.joinToString(separator = ", ") { "Flow: ${it.flow}" }
+
+            val intermenstrualBleedingRequest: ReadRecordsRequest<IntermenstrualBleedingRecord> = ReadRecordsRequest(
+                IntermenstrualBleedingRecord::class,
+                between(startTime, endTime)
+            )
+            val intermenstrualBleedingRecords: List<IntermenstrualBleedingRecord> = runBlocking {
+                healthConnectClient.readRecords(intermenstrualBleedingRequest).records
+            }
+            val intermenstrualBleedingData = if (intermenstrualBleedingRecords.isNotEmpty()) "Recorded" else "Not Recorded"
+
+            val sexualActivityRequest: ReadRecordsRequest<SexualActivityRecord> = ReadRecordsRequest(
+                SexualActivityRecord::class,
+                between(startTime, endTime)
+            )
+            val sexualActivityRecords: List<SexualActivityRecord> = runBlocking {
+                healthConnectClient.readRecords(sexualActivityRequest).records
+            }
+            val sexualActivityData = if (sexualActivityRecords.isNotEmpty()) "Recorded" else "Not Recorded"
+
 
             return "Heart Rate: $avgHeartRate bpm, Steps: $totalSteps, " +
                     "Active Calories: $totalActiveCalories, " +
                     "Total Calories: $totalCalories," +
                     " Distance: $totalDistance m, " +
                     "Speed: $avgSpeed m/s, " +
+                    "Power: $avgPower W, " +
                     " VO2 Max: $avgVo2Max, " +
                     "Body Fat: $avgBodyFat, " +
                     "Lean Body Mass: $avgLeanBodyMass, " +
@@ -278,6 +339,11 @@ class HealthDataWorker(context: Context, workerParams: WorkerParameters) : Liste
                     "Respiratory Rate: $avgRespiratoryRate rpm, " +
                     "Hydration: $totalHydration L, " +
                     "Nutrition Calories: $totalNutritionCalories kcal, " +
+                    "Basal Metabolic Rate: $avgBasalMetabolicRate kcal/day, " +
+                    "Sleep Duration: $totalSleepDuration s, " +
+                    "Menstruation: $menstruationData, " +
+                    "Intermenstrual Bleeding: $intermenstrualBleedingData, " +
+                    "Sexual Activity: $sexualActivityData, " +
                     "Timestamp: $endTime\n$exerciseSummary"
 
         } catch (e: Exception) {
