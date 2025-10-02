@@ -1,38 +1,30 @@
-package com.oxeai.health.ui.home;
+package com.oxeai.health.ui.home
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.oxeai.health.databinding.FragmentHomeBinding
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
+class HomeFragment : Fragment() {
+    private var binding: FragmentHomeBinding? = null
 
-import com.oxeai.health.databinding.FragmentHomeBinding;
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val homeViewModel = ViewModelProvider(this)[HomeViewModel::class.java]
 
-public class HomeFragment extends Fragment
-{
+        binding = FragmentHomeBinding.inflate(inflater, container, false)
+        val root: View = binding!!.getRoot()
 
-   private FragmentHomeBinding binding;
+        val textView = binding!!.textHome
+        homeViewModel.text.observe(getViewLifecycleOwner(), Observer { text: String? -> textView.text = text })
+        return root
+    }
 
-   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-   {
-      HomeViewModel homeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
-
-      binding = FragmentHomeBinding.inflate(inflater, container, false);
-      View root = binding.getRoot();
-
-      final TextView textView = binding.textHome;
-      homeViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-      return root;
-   }
-
-   @Override
-   public void onDestroyView()
-   {
-      super.onDestroyView();
-      binding = null;
-   }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
 }

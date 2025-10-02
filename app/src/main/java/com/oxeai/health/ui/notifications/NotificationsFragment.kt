@@ -1,38 +1,30 @@
-package com.oxeai.health.ui.notifications;
+package com.oxeai.health.ui.notifications
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.oxeai.health.databinding.FragmentNotificationsBinding
 
-import androidx.annotation.NonNull;
-import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
+class NotificationsFragment : Fragment() {
+    private var binding: FragmentNotificationsBinding? = null
 
-import com.oxeai.health.databinding.FragmentNotificationsBinding;
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        val notificationsViewModel = ViewModelProvider(this)[NotificationsViewModel::class.java]
 
-public class NotificationsFragment extends Fragment
-{
+        binding = FragmentNotificationsBinding.inflate(inflater, container, false)
+        val root: View = binding!!.getRoot()
 
-   private FragmentNotificationsBinding binding;
+        val textView = binding!!.textNotifications
+        notificationsViewModel.text.observe(getViewLifecycleOwner(), Observer { text: String? -> textView.text = text })
+        return root
+    }
 
-   public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
-   {
-      NotificationsViewModel notificationsViewModel = new ViewModelProvider(this).get(NotificationsViewModel.class);
-
-      binding = FragmentNotificationsBinding.inflate(inflater, container, false);
-      View root = binding.getRoot();
-
-      final TextView textView = binding.textNotifications;
-      notificationsViewModel.getText().observe(getViewLifecycleOwner(), textView::setText);
-      return root;
-   }
-
-   @Override
-   public void onDestroyView()
-   {
-      super.onDestroyView();
-      binding = null;
-   }
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding = null
+    }
 }

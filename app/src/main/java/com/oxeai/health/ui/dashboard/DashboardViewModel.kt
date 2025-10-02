@@ -1,22 +1,17 @@
-package com.oxeai.health.ui.dashboard;
+package com.oxeai.health.ui.dashboard
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-public class DashboardViewModel extends ViewModel
-{
+class DashboardViewModel : ViewModel() {
+    private val mText: MutableLiveData<String?>
 
-   private final MutableLiveData<String> mText;
+    init {
+        mText = MutableLiveData<String?>()
+        mText.setValue("This is dashboard fragment")
+    }
 
-   public DashboardViewModel()
-   {
-      mText = new MutableLiveData<>();
-      mText.setValue("This is dashboard fragment");
-   }
-
-   public LiveData<String> getText()
-   {
-      return mText;
-   }
+    val text: LiveData<String?>
+        get() = mText
 }

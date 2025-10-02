@@ -1,22 +1,17 @@
-package com.oxeai.health.ui.notifications;
+package com.oxeai.health.ui.notifications
 
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-public class NotificationsViewModel extends ViewModel
-{
+class NotificationsViewModel : ViewModel() {
+    private val mText: MutableLiveData<String?>
 
-   private final MutableLiveData<String> mText;
+    init {
+        mText = MutableLiveData<String?>()
+        mText.setValue("This is notifications fragment")
+    }
 
-   public NotificationsViewModel()
-   {
-      mText = new MutableLiveData<>();
-      mText.setValue("This is notifications fragment");
-   }
-
-   public LiveData<String> getText()
-   {
-      return mText;
-   }
+    val text: LiveData<String?>
+        get() = mText
 }
