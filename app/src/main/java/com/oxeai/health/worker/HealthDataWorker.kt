@@ -4,8 +4,14 @@ import android.content.Context
 import android.util.Log
 import androidx.concurrent.futures.CallbackToFutureAdapter
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.records.Vo2MaxRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
 import androidx.work.ListenableWorker
@@ -59,20 +65,84 @@ class HealthDataWorker(context: Context, workerParams: WorkerParameters) : Liste
                 HeartRateRecord::class,
                 between(startTime, endTime)
             )
+            val exerciseSessionRequest: ReadRecordsRequest<ExerciseSessionRecord> = ReadRecordsRequest(
+                ExerciseSessionRecord::class,
+                between(startTime, endTime)
+            )
 
             // Since you need a synchronous call, use runBlocking
             val stepsRecords: List<StepsRecord> = runBlocking {
                 healthConnectClient.readRecords(stepsRequest).records
             }
-//            stepsRecords.forEach { record ->
-//                Log.d(TAG, "Steps: ${record.count}")
-//            }
+            val totalSteps = stepsRecords.sumOf { it.count }
 
             val heartRateRecords: List<HeartRateRecord> = runBlocking {
                 healthConnectClient.readRecords(heartRateRequest).records
             }
+            val avgHeartRate = heartRateRecords.flatMap { it.samples }.map { it.beatsPerMinute }.average()
 
-            return "got it"
+
+            val exerciseSessions: List<ExerciseSessionRecord> = runBlocking {
+                healthConnectClient.readRecords(exerciseSessionRequest).records
+            }
+
+            val exerciseSummary = exerciseSessions.joinToString(separator = "\n") {
+                "Exercise: ${it.exerciseType}, Duration: ${it.endTime.epochSecond - it.startTime.epochSecond}s"
+            }
+
+            val activeCaloriesRequest: ReadRecordsRequest<ActiveCaloriesBurnedRecord> = ReadRecordsRequest(
+                ActiveCaloriesBurnedRecord::class,
+                between(startTime, endTime)
+            )
+            val activeCaloriesRecords: List<ActiveCaloriesBurnedRecord> = runBlocking {
+                healthConnectClient.readRecords(activeCaloriesRequest).records
+            }
+            val totalActiveCalories = activeCaloriesRecords.sumOf { it.energy.inCalories }
+
+            val totalCaloriesRequest: ReadRecordsRequest<TotalCaloriesBurnedRecord> = ReadRecordsRequest(
+                TotalCaloriesBurnedRecord::class,
+                between(startTime, endTime)
+            )
+            val totalCaloriesRecords: List<TotalCaloriesBurnedRecord> = runBlocking {
+                healthConnectClient.readRecords(totalCaloriesRequest).records
+            }
+            val totalCalories = totalCaloriesRecords.sumOf { it.energy.inCalories }
+
+            val distanceRequest: ReadRecordsRequest<DistanceRecord> = ReadRecordsRequest(
+                DistanceRecord::class,
+                between(startTime, endTime)
+            )
+            val distanceRecords: List<DistanceRecord> = runBlocking {
+                healthConnectClient.readRecords(distanceRequest).records
+            }
+            val totalDistance = distanceRecords.sumOf { it.distance.inMeters }
+
+            val speedRequest: ReadRecordsRequest<SpeedRecord> = ReadRecordsRequest(
+                SpeedRecord::class,
+                between(startTime, endTime)
+            )
+            val speedRecords: List<SpeedRecord> = runBlocking {
+                healthConnectClient.readRecords(speedRequest).records
+            }
+            val avgSpeed = speedRecords.flatMap { it.samples }.map { it.speed.inMetersPerSecond }.average()
+
+            // Move Minutes and Heart Points not avail in GoogleHealth
+
+            val vo2MaxRequest: ReadRecordsRequest<Vo2MaxRecord> = ReadRecordsRequest(
+                Vo2MaxRecord::class,
+                between(startTime, endTime)
+            )
+            val vo2MaxRecords: List<Vo2MaxRecord> = runBlocking {
+                healthConnectClient.readRecords(vo2MaxRequest).records
+            }
+            val avgVo2Max = vo2MaxRecords.map { it.vo2MillilitersPerMinuteKilogram }.average()
+
+            return "Heart Rate: $avgHeartRate bpm, Steps: $totalSteps, " +
+                    "Active Calories: $totalActiveCalories, " +
+                    "Total Calories: $totalCalories," +
+                    " Distance: $totalDistance m, " +
+                    "Speed: $avgSpeed m/s, " +
+                    " VO2 Max: $avgVo2Max, Timestamp: $endTime\n$exerciseSummary"
 
         } catch (e: Exception) {
             Log.e(TAG, "Error reading health data", e)

@@ -5,8 +5,14 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts.RequestMultiplePermissions
 import androidx.appcompat.app.AppCompatActivity
 import androidx.health.connect.client.permission.HealthPermission
+import androidx.health.connect.client.records.ActiveCaloriesBurnedRecord
+import androidx.health.connect.client.records.DistanceRecord
+import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.records.HeartRateRecord
+import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.records.StepsRecord
+import androidx.health.connect.client.records.TotalCaloriesBurnedRecord
+import androidx.health.connect.client.records.Vo2MaxRecord
 import androidx.navigation.Navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.NavigationUI.setupActionBarWithNavController
@@ -60,6 +66,12 @@ class MainActivity : AppCompatActivity() {
         val permissions: MutableSet<String> = HashSet()
         permissions.add(HealthPermission.getReadPermission(StepsRecord::class))
         permissions.add(HealthPermission.getReadPermission(HeartRateRecord::class))
+        permissions.add(HealthPermission.getReadPermission(ExerciseSessionRecord::class))
+        permissions.add(HealthPermission.getReadPermission(ActiveCaloriesBurnedRecord::class))
+        permissions.add(HealthPermission.getReadPermission(TotalCaloriesBurnedRecord::class))
+        permissions.add(HealthPermission.getReadPermission(DistanceRecord::class))
+        permissions.add(HealthPermission.getReadPermission(SpeedRecord::class))
+        permissions.add(HealthPermission.getReadPermission(Vo2MaxRecord::class))
 
         requestPermissionActivityContract.launch(permissions.toTypedArray())
     }
