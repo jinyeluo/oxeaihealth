@@ -49,6 +49,7 @@ dependencies {
    implementation libs.core.ktx
    implementation(libs.mongodb.driver.kotlin.coroutine)
    implementation libs.bson
+   implementation(libs.kotlinx.serialization.json.v160)
 
    // Kotlinx Serialization
    implementation(libs.kotlinx.serialization.json)
