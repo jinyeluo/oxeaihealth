@@ -145,6 +145,24 @@ data class Vo2MaxData(
 ) : BaseHealthData()
 
 @Serializable
+data class BasalMetabolicRateData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val basalMetabolicRate: TrackedMeasurement
+) : BaseHealthData()
+
+@Serializable
+data class PowerData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val power: TrackedMeasurement
+) : BaseHealthData()
+
+@Serializable
 data class BodyFatData(
     override val userId: String,
     override val timestamp: Instant,
@@ -197,6 +215,89 @@ data class BloodPressureData(
     override val metadata: ActivityMetadata,
     val systolic: TrackedMetric,
     val diastolic: TrackedMetric
+) : BaseHealthData()
+
+@Serializable
+data class BloodGlucoseData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val bloodGlucose: BloodGlucoseReading
+) : BaseHealthData()
+
+@Serializable
+data class BodyTemperatureData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val bodyTemperature: TemperatureReading
+) : BaseHealthData()
+
+@Serializable
+data class OxygenSaturationData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val oxygenSaturation: OxygenSaturation
+) : BaseHealthData()
+
+@Serializable
+data class RespiratoryRateData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val respiratoryRate: RespiratoryRate
+) : BaseHealthData()
+
+@Serializable
+data class HydrationData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val hydration: Hydration
+) : BaseHealthData()
+
+@Serializable
+data class NutritionData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val nutrition: NutritionHourly
+) : BaseHealthData()
+
+@Serializable
+data class SleepSessionData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val startTime: Instant,
+    val endTime: Instant,
+    val duration: Long,
+    val stages: String
+) : BaseHealthData()
+
+@Serializable
+data class MenstruationData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata,
+    val flow: String
+) : BaseHealthData()
+
+@Serializable
+data class IntermenstrualBleedingData(
+    override val userId: String,
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: ActivityMetadata
 ) : BaseHealthData()
 
 enum class DataSource {

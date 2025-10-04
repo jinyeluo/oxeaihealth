@@ -2,44 +2,40 @@
 agp = "8.13.0"
 bson = "5.6.0"
 concurrentFutures = "1.3.0"
-connectClient = "1.1.0-alpha08"
 guava = "33.5.0-android"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 espressoCore = "3.7.0"
 appcompat = "1.7.1"
 kotlinxSerializationJson = "1.9.0"
-kotlinxSerializationJsonVersion = "1.6.0"
 material = "1.13.0"
-constraintlayout = "2.1.4"
-lifecycleLivedataKtx = "2.6.1"
-lifecycleViewmodelKtx = "2.6.1"
-mongodbDriverKotlinCoroutine = "5.0.0"
-navigationFragment = "2.6.0"
-navigationUi = "2.6.0"
-healthConnect = "1.1.0-alpha08"
-playServicesAuth = "20.7.0"
+constraintlayout = "2.2.1"
+lifecycleLivedataKtx = "2.9.4"
+lifecycleViewmodelKtx = "2.9.4"
+mongodbDriverKotlinCoroutine = "5.6.0"
+navigationFragment = "2.9.5"
+navigationUi = "2.9.5"
+healthConnect = "1.1.0-rc03"
+playServicesAuth = "21.4.0"
 workRuntimeKtx = "2.10.5"
-kotlin = "2.2.0"
+kotlin = "2.2.20"
 coreKtx = "1.17.0"
 
 [libraries]
 bson = { module = "org.mongodb:bson", version.ref = "bson" }
 bson-kotlinx = { module = "org.mongodb.kotlin:bson-kotlinx", version.ref = "mongodbDriverKotlinCoroutine" }
 concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrentFutures" }
-connect-client-v110alpha08 = { module = "androidx.health.connect:connect-client", version.ref = "connectClient" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
-kotlinx-serialization-json-v160 = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-mongodb-driver-kotlin-coroutine = { module = "org.mongodb.kotlin:mongodb-driver-kotlin-coroutine", version.ref = "mongodbDriverKotlinCoroutine" }
+mongodb-driver-kotlin-coroutine = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodbDriverKotlinCoroutine" }
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 health-connect = { group = "androidx.health.connect", name = "connect-client", version.ref = "healthConnect" }

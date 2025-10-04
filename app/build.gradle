@@ -29,6 +29,12 @@ android {
    buildFeatures {
       viewBinding true
    }
+   packaging {
+      resources {
+         excludes.add('/META-INF/native-image/native-image.properties')
+         excludes.add('META-INF/native-image/reflect-config.json')
+      }
+   }
 }
 
 dependencies {
@@ -42,20 +48,15 @@ dependencies {
    implementation libs.navigation.ui
    implementation libs.work.runtime.ktx
    implementation libs.concurrent.futures
-   implementation libs.connect.client.v110alpha08
    implementation libs.guava
    implementation libs.health.connect
    implementation libs.play.services.auth
    implementation libs.core.ktx
-   implementation(libs.mongodb.driver.kotlin.coroutine)
    implementation libs.bson
-   implementation(libs.kotlinx.serialization.json.v160)
-
+   implementation libs.mongodb.driver.kotlin.coroutine
+   implementation 'org.mongodb:bson-kotlinx:5.6.0'
    // Kotlinx Serialization
-   implementation(libs.kotlinx.serialization.json)
-
-   // BSON Kotlinx Serialization (bridges MongoDB and kotlinx.serialization)
-   implementation(libs.bson.kotlinx)
+   implementation libs.kotlinx.serialization.json
 
    testImplementation libs.junit
    androidTestImplementation libs.ext.junit
