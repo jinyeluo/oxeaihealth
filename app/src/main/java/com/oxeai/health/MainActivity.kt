@@ -39,7 +39,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.oxeai.health.databinding.ActivityMainBinding
-import com.oxeai.health.worker.HealthDataWorker
+import com.oxeai.healthconnect.fetchers.HealthDataWorker
 import java.util.concurrent.TimeUnit
 
 class MainActivity : AppCompatActivity() {

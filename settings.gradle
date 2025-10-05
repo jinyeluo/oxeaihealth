@@ -23,4 +23,5 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "OxeAIHealth"
+include ':oxeaihealthconnect'
 include ':app'
