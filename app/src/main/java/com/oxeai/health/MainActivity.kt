@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         val workManager = WorkManager.getInstance(this)
         val healthDataWorkRequest = PeriodicWorkRequest.Builder(HealthDataWorker::class, 15, TimeUnit.MINUTES)
             .build()
-        workManager.enqueueUniquePeriodicWork("HealthDataWorker", ExistingPeriodicWorkPolicy.KEEP, healthDataWorkRequest)
+        workManager.enqueueUniquePeriodicWork("OxeAIHealthDataWorker", ExistingPeriodicWorkPolicy.KEEP, healthDataWorkRequest)
 
         requestHealthConnectPermissions()
     }
