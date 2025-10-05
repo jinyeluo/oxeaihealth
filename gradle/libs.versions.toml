@@ -12,7 +12,6 @@ material = "1.13.0"
 constraintlayout = "2.2.1"
 lifecycleLivedataKtx = "2.9.4"
 lifecycleViewmodelKtx = "2.9.4"
-mongodbDriverKotlinCoroutine = "5.6.0"
 navigationFragment = "2.9.5"
 navigationUi = "2.9.5"
 healthConnect = "1.1.0-rc03"
@@ -23,7 +22,6 @@ coreKtx = "1.17.0"
 
 [libraries]
 bson = { module = "org.mongodb:bson", version.ref = "bson" }
-bson-kotlinx = { module = "org.mongodb.kotlin:bson-kotlinx", version.ref = "mongodbDriverKotlinCoroutine" }
 concurrent-futures = { module = "androidx.concurrent:concurrent-futures", version.ref = "concurrentFutures" }
 guava = { module = "com.google.guava:guava", version.ref = "guava" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -35,7 +33,6 @@ material = { group = "com.google.android.material", name = "material", version.r
 constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 lifecycle-livedata-ktx = { group = "androidx.lifecycle", name = "lifecycle-livedata-ktx", version.ref = "lifecycleLivedataKtx" }
 lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodelKtx" }
-mongodb-driver-kotlin-coroutine = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodbDriverKotlinCoroutine" }
 navigation-fragment = { group = "androidx.navigation", name = "navigation-fragment", version.ref = "navigationFragment" }
 navigation-ui = { group = "androidx.navigation", name = "navigation-ui", version.ref = "navigationUi" }
 health-connect = { group = "androidx.health.connect", name = "connect-client", version.ref = "healthConnect" }
