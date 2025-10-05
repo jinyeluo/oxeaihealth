@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Environment
 import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
-import com.oxeai.health.BaseHealthData
+import com.oxeai.health.models.BaseHealthData
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileWriter
@@ -23,7 +23,7 @@ open class HealthDataFetcher(context: Context) {
             val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "health_data.json")
 //            val file = File(context.filesDir, "health_data.json")
             val writer = FileWriter(file, true) // Append to the file
-            writer.append(Json.encodeToString(data)).append("\n")
+            writer.append(Json.encodeToString(BaseHealthData.serializer(), data)).append("\n")
             writer.flush()
             writer.close()
             Log.d(TAG, "Health data saved to: " + file.absolutePath)

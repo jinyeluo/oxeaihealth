@@ -5,10 +5,10 @@ import android.util.Log
 import androidx.health.connect.client.records.Vo2MaxRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.health.ActivityMetadata
-import com.oxeai.health.DataConfidence
-import com.oxeai.health.DataSource
-import com.oxeai.health.Vo2MaxData
+import com.oxeai.health.models.ActivityMetadata
+import com.oxeai.health.models.DataConfidence
+import com.oxeai.health.models.DataSource
+import com.oxeai.health.models.Vo2MaxData
 
 class Vo2MaxFetcher(context: Context) : HealthDataFetcher(context) {
 

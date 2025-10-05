@@ -5,14 +5,14 @@ import android.util.Log
 import androidx.health.connect.client.records.NutritionRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.health.ActivityMetadata
-import com.oxeai.health.CaloriesConsumed
-import com.oxeai.health.DataConfidence
-import com.oxeai.health.DataSource
-import com.oxeai.health.Macronutrients
-import com.oxeai.health.NutrientAmount
-import com.oxeai.health.NutritionData
-import com.oxeai.health.NutritionHourly
+import com.oxeai.health.models.ActivityMetadata
+import com.oxeai.health.models.CaloriesConsumed
+import com.oxeai.health.models.DataConfidence
+import com.oxeai.health.models.DataSource
+import com.oxeai.health.models.Macronutrients
+import com.oxeai.health.models.NutrientAmount
+import com.oxeai.health.models.Nutrition
+import com.oxeai.health.models.NutritionData
 
 class NutritionFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getNutrition() {
@@ -32,7 +32,7 @@ class NutritionFetcher(context: Context) : HealthDataFetcher(context) {
                         devices = listOf(record.metadata.device.toString()),
                         confidence = DataConfidence.HIGH
                     ),
-                    nutrition = NutritionHourly(
+                    nutrition = Nutrition(
                         userId = "user_id",
                         timestamp = record.startTime,
                         source = DataSource.GOOGLE,

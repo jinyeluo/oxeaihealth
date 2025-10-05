@@ -5,11 +5,11 @@ import android.util.Log
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.health.ActivityMetadata
-import com.oxeai.health.DataConfidence
-import com.oxeai.health.DataSource
-import com.oxeai.health.SimpleMetric
-import com.oxeai.health.StandHoursData
+import com.oxeai.health.models.ActivityMetadata
+import com.oxeai.health.models.DataConfidence
+import com.oxeai.health.models.DataSource
+import com.oxeai.health.models.SimpleMetric
+import com.oxeai.health.models.StandHoursData
 import java.time.Duration
 
 class StandHoursFetcher(context: Context) : HealthDataFetcher(context) {

@@ -5,8 +5,10 @@ import android.util.Log
 import androidx.health.connect.client.records.BodyFatRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.health.BodyFatData
-import com.oxeai.health.DataSource
+import com.oxeai.health.models.ActivityMetadata
+import com.oxeai.health.models.BodyFatData
+import com.oxeai.health.models.DataConfidence
+import com.oxeai.health.models.DataSource
 
 class BodyFatFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getBodyFat() {
@@ -27,9 +29,9 @@ class BodyFatFetcher(context: Context) : HealthDataFetcher(context) {
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 bodyFatPercentage = averageBodyFat,
-                metadata = com.oxeai.health.ActivityMetadata(
+                metadata = ActivityMetadata(
                     devices = listOf("Unknown"),
-                    confidence = com.oxeai.health.DataConfidence.HIGH
+                    confidence = DataConfidence.HIGH
                 )
             )
 

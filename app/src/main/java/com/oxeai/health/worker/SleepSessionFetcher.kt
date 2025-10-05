@@ -5,10 +5,10 @@ import android.util.Log
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.health.ActivityMetadata
-import com.oxeai.health.DataConfidence
-import com.oxeai.health.DataSource
-import com.oxeai.health.SleepSessionData
+import com.oxeai.health.models.ActivityMetadata
+import com.oxeai.health.models.DataConfidence
+import com.oxeai.health.models.DataSource
+import com.oxeai.health.models.SleepSessionData
 
 class SleepSessionFetcher(context: Context) : HealthDataFetcher(context) {
 

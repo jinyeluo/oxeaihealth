@@ -5,9 +5,11 @@ import android.util.Log
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.health.DataSource
-import com.oxeai.health.StepsData
-import com.oxeai.health.TrackedMetric
+import com.oxeai.health.models.ActivityMetadata
+import com.oxeai.health.models.DataConfidence
+import com.oxeai.health.models.DataSource
+import com.oxeai.health.models.StepsData
+import com.oxeai.health.models.TrackedMetric
 
 class StepsFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getSteps() {
@@ -27,9 +29,9 @@ class StepsFetcher(context: Context) : HealthDataFetcher(context) {
                     count = totalSteps.toInt(),
                     sources = listOf("GoogleFit")
                 ),
-                metadata = com.oxeai.health.ActivityMetadata(
+                metadata = ActivityMetadata(
                     devices = listOf("Unknown"),
-                    confidence = com.oxeai.health.DataConfidence.HIGH
+                    confidence = DataConfidence.HIGH
                 )
             )
 

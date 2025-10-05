@@ -5,11 +5,11 @@ import android.util.Log
 import androidx.health.connect.client.records.RespiratoryRateRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.health.ActivityMetadata
-import com.oxeai.health.DataConfidence
-import com.oxeai.health.DataSource
-import com.oxeai.health.RespiratoryRate
-import com.oxeai.health.RespiratoryRateData
+import com.oxeai.health.models.ActivityMetadata
+import com.oxeai.health.models.DataConfidence
+import com.oxeai.health.models.DataSource
+import com.oxeai.health.models.RespiratoryRate
+import com.oxeai.health.models.RespiratoryRateData
 
 class RespiratoryRateFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getRespiratoryRate() {

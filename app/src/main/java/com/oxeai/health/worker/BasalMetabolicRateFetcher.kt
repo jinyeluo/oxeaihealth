@@ -5,11 +5,11 @@ import android.util.Log
 import androidx.health.connect.client.records.BasalMetabolicRateRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.health.ActivityMetadata
-import com.oxeai.health.BasalMetabolicRateData
-import com.oxeai.health.DataConfidence
-import com.oxeai.health.DataSource
-import com.oxeai.health.TrackedMeasurement
+import com.oxeai.health.models.ActivityMetadata
+import com.oxeai.health.models.BasalMetabolicRateData
+import com.oxeai.health.models.DataConfidence
+import com.oxeai.health.models.DataSource
+import com.oxeai.health.models.TrackedMeasurement
 
 class BasalMetabolicRateFetcher(context: Context) : HealthDataFetcher(context) {
 
