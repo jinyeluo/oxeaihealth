@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.RespiratoryRateRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -15,6 +16,12 @@ import java.util.UUID
 class RespiratoryRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getRespiratoryRate() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(RespiratoryRateRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for RespiratoryRateRecord is not granted.")
+                return
+            }
+
             val respiratoryRateRequest = ReadRecordsRequest(
                 recordType = RespiratoryRateRecord::class,
                 timeRangeFilter = between(startTime, endTime)
@@ -40,7 +47,7 @@ class RespiratoryRateFetcher(context: Context, userId: UUID) : HealthDataFetcher
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 

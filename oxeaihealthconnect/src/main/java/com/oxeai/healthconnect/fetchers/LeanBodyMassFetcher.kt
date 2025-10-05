@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.LeanBodyMassRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -14,6 +15,12 @@ import java.util.UUID
 class LeanBodyMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getLeanBodyMass() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(LeanBodyMassRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for LeanBodyMassRecord is not granted.")
+                return
+            }
+
             val leanBodyMassRequest = ReadRecordsRequest(
                 recordType = LeanBodyMassRecord::class,
                 timeRangeFilter = between(startTime, endTime)
@@ -40,7 +47,7 @@ class LeanBodyMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
             sendDataToApi(leanBodyMassData)
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 

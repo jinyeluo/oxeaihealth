@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BloodGlucoseRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -16,6 +17,12 @@ import java.util.UUID
 class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getBloodGlucose() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(BloodGlucoseRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for BloodGlucoseRecord is not granted.")
+                return
+            }
+
             val bloodGlucoseRequest = ReadRecordsRequest(
                 recordType = BloodGlucoseRecord::class,
                 timeRangeFilter = between(startTime, endTime)
@@ -45,7 +52,7 @@ class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 

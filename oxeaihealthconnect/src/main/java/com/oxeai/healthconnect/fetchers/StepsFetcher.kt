@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.StepsRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -16,12 +17,22 @@ import java.util.UUID
 class StepsFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getSteps() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(StepsRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for StepsRecord is not granted.")
+                return
+            }
+
             val stepsRequest = ReadRecordsRequest(
                 recordType = StepsRecord::class,
                 timeRangeFilter = between(startTime, endTime)
             )
             val stepsRecords = healthConnectClient.readRecords(stepsRequest)
             val totalSteps = stepsRecords.records.sumOf { it.count }
+            if (totalSteps == 0L) {
+                Log.w(TAG, "No steps data available.")
+                return
+            }
 
             val stepsData = StepsData(
                 userId = userId,
@@ -29,10 +40,11 @@ class StepsFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
                 source = DataSource.GOOGLE,
                 steps = TrackedMetric(
                     count = totalSteps.toInt(),
-                    sources = listOf("GoogleFit")
                 ),
+                startTime = startTime,
+                endTime = endTime,
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(stepsRecords),
                     confidence = DataConfidence.HIGH
                 )
             )
@@ -41,7 +53,7 @@ class StepsFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
             sendDataToApi(stepsData)
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 

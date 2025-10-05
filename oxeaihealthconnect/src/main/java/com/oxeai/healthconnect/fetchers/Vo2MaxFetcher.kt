@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.Vo2MaxRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -15,6 +16,12 @@ class Vo2MaxFetcher(context: Context, userId: UUID) : HealthDataFetcher(context,
 
     suspend fun getVo2Max() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(Vo2MaxRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for Vo2MaxRecord is not granted.")
+                return
+            }
+
             val vo2MaxRequest = ReadRecordsRequest(
                 recordType = Vo2MaxRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
@@ -36,7 +43,7 @@ class Vo2MaxFetcher(context: Context, userId: UUID) : HealthDataFetcher(context,
             saveDataAsJson(vo2MaxData)
             sendDataToApi(vo2MaxData)
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading Vo2Max data", e)
+            onError(e)
         }
     }
 

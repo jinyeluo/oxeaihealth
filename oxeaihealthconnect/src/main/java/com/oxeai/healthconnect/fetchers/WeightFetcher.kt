@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.WeightRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -15,6 +16,12 @@ import java.util.UUID
 class WeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getWeight() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(WeightRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for WeightRecord is not granted.")
+                return
+            }
+
             val weightRequest = ReadRecordsRequest(
                 recordType = WeightRecord::class,
                 timeRangeFilter = between(startTime, endTime)
@@ -40,7 +47,7 @@ class WeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context,
             sendDataToApi(weightData)
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 

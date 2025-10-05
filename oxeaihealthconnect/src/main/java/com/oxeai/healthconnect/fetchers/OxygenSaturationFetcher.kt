@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.OxygenSaturationRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -15,6 +16,12 @@ import java.util.UUID
 class OxygenSaturationFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getOxygenSaturation() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(OxygenSaturationRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for OxygenSaturationRecord is not granted.")
+                return
+            }
+
             val oxygenSaturationRequest = ReadRecordsRequest(
                 recordType = OxygenSaturationRecord::class,
                 timeRangeFilter = between(startTime, endTime)
@@ -40,7 +47,7 @@ class OxygenSaturationFetcher(context: Context, userId: UUID) : HealthDataFetche
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 

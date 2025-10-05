@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -17,6 +18,12 @@ class StandHoursFetcher(context: Context, userId: UUID) : HealthDataFetcher(cont
 
     suspend fun getStandHours() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(ExerciseSessionRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for ExerciseSessionRecord is not granted.")
+                return
+            }
+
             // Note: Health Connect does not have a direct equivalent for "Stand Hours".
             // We are using ExerciseSessionRecord with a specific type as a proxy.
             // This may not be an accurate representation of stand hours.
@@ -46,7 +53,7 @@ class StandHoursFetcher(context: Context, userId: UUID) : HealthDataFetcher(cont
             saveDataAsJson(standHoursData)
             sendDataToApi(standHoursData)
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading stand hours data", e)
+            onError(e)
         }
     }
 

@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.Environment
 import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.records.Record
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.BaseHealthData
 import kotlinx.serialization.json.Json
 import java.io.File
@@ -30,7 +32,7 @@ open class HealthDataFetcher(context: Context, protected val userId: UUID) {
             writer.close()
             Log.d(TAG, "Health data saved to: " + file.absolutePath)
         } catch (e: IOException) {
-            Log.e(TAG, "Error saving health data to file", e)
+            onError(e)
         }
     }
 
@@ -41,7 +43,17 @@ open class HealthDataFetcher(context: Context, protected val userId: UUID) {
         // Placeholder for API call
     }
 
+    protected fun onError(e: Exception) {
+        //todo: handle error
+        Log.e(TAG, "Error reading data", e)
+    }
+
     companion object {
         private const val TAG = "HealthDataFetcher"
+        fun <T : Record> getDeviceModels(stepsRecords: ReadRecordsResponse<T>): List<String> {
+            return stepsRecords.records
+                .mapNotNull { it.metadata.device?.model }
+                .distinct()
+        }
     }
 }

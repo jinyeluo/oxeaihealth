@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.MenstruationFlowRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -15,6 +16,12 @@ class MenstruationFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
 
     suspend fun getMenstruation() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(MenstruationFlowRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for MenstruationFlowRecord is not granted.")
+                return
+            }
+
             val menstruationRequest = ReadRecordsRequest(
                 recordType = MenstruationFlowRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
@@ -39,7 +46,7 @@ class MenstruationFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
                 sendDataToApi(it)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading menstruation data", e)
+            onError(e)
         }
     }
 

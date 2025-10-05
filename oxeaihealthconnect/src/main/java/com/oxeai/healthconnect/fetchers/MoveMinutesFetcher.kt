@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -17,6 +18,12 @@ class MoveMinutesFetcher(context: Context, userId: UUID) : HealthDataFetcher(con
 
     suspend fun getMoveMinutes() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(ExerciseSessionRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for ExerciseSessionRecord is not granted.")
+                return
+            }
+
             val exerciseSessionRequest: ReadRecordsRequest<ExerciseSessionRecord> = ReadRecordsRequest(
                 ExerciseSessionRecord::class,
                 between(startTime, endTime)
@@ -44,7 +51,7 @@ class MoveMinutesFetcher(context: Context, userId: UUID) : HealthDataFetcher(con
             saveDataAsJson(moveMinutesData)
             sendDataToApi(moveMinutesData)
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading move minutes data", e)
+            onError(e)
         }
     }
 

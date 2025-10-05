@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.BoneMassRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -15,6 +16,12 @@ import java.util.UUID
 class BoneMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getBoneMass() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(BoneMassRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for BoneMassRecord is not granted.")
+                return
+            }
+
             val boneMassRequest = ReadRecordsRequest(
                 recordType = BoneMassRecord::class,
                 timeRangeFilter = between(startTime, endTime)
@@ -40,7 +47,7 @@ class BoneMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(contex
             sendDataToApi(boneMassData)
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 

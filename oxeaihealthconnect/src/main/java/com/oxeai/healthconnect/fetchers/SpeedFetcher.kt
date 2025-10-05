@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.SpeedRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -15,6 +16,12 @@ class SpeedFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
 
     suspend fun getSpeed() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(SpeedRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for SpeedRecord is not granted.")
+                return
+            }
+
             val speedRequest = ReadRecordsRequest(
                 recordType = SpeedRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
@@ -36,7 +43,7 @@ class SpeedFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
             saveDataAsJson(speedData)
             sendDataToApi(speedData)
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading speed data", e)
+            onError(e)
         }
     }
 

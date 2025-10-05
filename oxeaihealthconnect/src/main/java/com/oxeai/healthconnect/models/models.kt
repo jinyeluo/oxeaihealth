@@ -15,6 +15,11 @@ sealed class BaseHealthData {
 }
 
 @Serializable
+abstract class IntervalHealthData : BaseHealthData() {
+    abstract val startTime: Instant
+    abstract val endTime: Instant
+}
+@Serializable
 data class StepsData(
     @Serializable(with = UUIDSerializer::class)
     override val userId: UUID,
@@ -22,8 +27,12 @@ data class StepsData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
+    @Serializable(with = InstantSerializer::class)
+    override val startTime: Instant,
+    @Serializable(with = InstantSerializer::class)
+    override val endTime: Instant,
     val steps: TrackedMetric
-) : BaseHealthData()
+) : IntervalHealthData()
 
 @Serializable
 data class DistanceData(
@@ -37,15 +46,20 @@ data class DistanceData(
 ) : BaseHealthData()
 
 @Serializable
-data class ActiveCaloriesData(
+data class CaloriesData(
     @Serializable(with = UUIDSerializer::class)
     override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val caloriesActive: TrackedMeasurement
-) : BaseHealthData()
+    @Serializable(with = InstantSerializer::class)
+    override val startTime: Instant,
+    @Serializable(with = InstantSerializer::class)
+    override val endTime: Instant,
+    val caloriesActive: TrackedMeasurement,
+    val caloriesTotal: TrackedMeasurement
+) : IntervalHealthData()
 
 @Serializable
 data class BasalCaloriesData(
@@ -335,15 +349,13 @@ enum class DataSource {
 
 @Serializable
 data class TrackedMetric(
-    val count: Int,
-    val sources: List<String>
+    val count: Int
 )
 
 @Serializable
 data class TrackedMeasurement(
     val value: Double,
-    val unit: String,
-    val sources: List<String>
+    val unit: String
 )
 
 @Serializable

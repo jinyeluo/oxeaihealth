@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.IntermenstrualBleedingRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -15,6 +16,12 @@ class IntermenstrualBleedingFetcher(context: Context, userId: UUID) : HealthData
 
     suspend fun getIntermenstrualBleeding() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(IntermenstrualBleedingRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for IntermenstrualBleedingRecord is not granted.")
+                return
+            }
+
             val intermenstrualBleedingRequest = ReadRecordsRequest(
                 recordType = IntermenstrualBleedingRecord::class,
                 timeRangeFilter = TimeRangeFilter.Companion.between(startTime, endTime)
@@ -38,7 +45,7 @@ class IntermenstrualBleedingFetcher(context: Context, userId: UUID) : HealthData
                 sendDataToApi(it)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading intermenstrual bleeding data", e)
+            onError(e)
         }
     }
 

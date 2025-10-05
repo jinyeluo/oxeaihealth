@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.DistanceRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -16,6 +17,12 @@ class DistanceFetcher(context: Context, userId: UUID) : HealthDataFetcher(contex
 
     suspend fun getDistance() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(DistanceRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for DistanceRecord is not granted.")
+                return
+            }
+
             val distanceRequest = ReadRecordsRequest(
                 recordType = DistanceRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
@@ -41,7 +48,7 @@ class DistanceFetcher(context: Context, userId: UUID) : HealthDataFetcher(contex
             saveDataAsJson(distanceData)
             sendDataToApi(distanceData)
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading distance data", e)
+            onError(e)
         }
     }
 

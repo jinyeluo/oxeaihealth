@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.FloorsClimbedRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -16,6 +17,12 @@ class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher(c
 
     suspend fun getFloorsClimbed() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(FloorsClimbedRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for FloorsClimbedRecord is not granted.")
+                return
+            }
+
             val floorsClimbedRequest = ReadRecordsRequest(
                 recordType = FloorsClimbedRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
@@ -40,7 +47,7 @@ class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher(c
             saveDataAsJson(floorsClimbedData)
             sendDataToApi(floorsClimbedData)
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading floors climbed data", e)
+            onError(e)
         }
     }
 

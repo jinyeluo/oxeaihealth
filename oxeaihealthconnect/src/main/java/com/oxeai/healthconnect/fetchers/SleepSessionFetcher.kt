@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.SleepSessionRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -15,6 +16,12 @@ class SleepSessionFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
 
     suspend fun getSleepSession() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(SleepSessionRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for SleepSessionRecord is not granted.")
+                return
+            }
+
             val sleepSessionRequest = ReadRecordsRequest(
                 recordType = SleepSessionRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
@@ -42,7 +49,7 @@ class SleepSessionFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
                 sendDataToApi(it)
             }
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading sleep session data", e)
+            onError(e)
         }
     }
 

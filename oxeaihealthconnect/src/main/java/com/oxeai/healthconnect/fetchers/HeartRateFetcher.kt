@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -15,6 +16,12 @@ class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(conte
 
     suspend fun getHeartRate() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(HeartRateRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for HeartRateRecord is not granted.")
+                return
+            }
+
             val heartRateRequest = ReadRecordsRequest(
                 recordType = HeartRateRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
@@ -41,7 +48,7 @@ class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(conte
             saveDataAsJson(heartRateData)
             sendDataToApi(heartRateData)
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading heart rate data", e)
+            onError(e)
         }
     }
 

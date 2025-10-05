@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HydrationRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -15,6 +16,12 @@ import java.util.UUID
 class HydrationFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getHydration() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(HydrationRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for HydrationRecord is not granted.")
+                return
+            }
+
             val hydrationRequest = ReadRecordsRequest(
                 recordType = HydrationRecord::class,
                 timeRangeFilter = between(startTime, endTime)
@@ -40,7 +47,7 @@ class HydrationFetcher(context: Context, userId: UUID) : HealthDataFetcher(conte
             }
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 

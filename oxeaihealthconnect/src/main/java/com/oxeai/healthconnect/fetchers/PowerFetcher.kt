@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.PowerRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter
@@ -16,6 +17,12 @@ class PowerFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
 
     suspend fun getPower() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(PowerRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for PowerRecord is not granted.")
+                return
+            }
+
             val powerRequest = ReadRecordsRequest(
                 recordType = PowerRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
@@ -41,7 +48,7 @@ class PowerFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
             saveDataAsJson(powerData)
             sendDataToApi(powerData)
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading power data", e)
+            onError(e)
         }
     }
 

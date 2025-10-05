@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
 import android.util.Log
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeightRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
@@ -15,6 +16,12 @@ import java.util.UUID
 class HeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getHeight() {
         try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(HeightRecord::class) !in permissions) {
+                Log.w(TAG, "Read permission for HeightRecord is not granted.")
+                return
+            }
+
             val heightRequest = ReadRecordsRequest(
                 recordType = HeightRecord::class,
                 timeRangeFilter = between(startTime, endTime)
@@ -40,7 +47,7 @@ class HeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context,
             sendDataToApi(heightData)
 
         } catch (e: Exception) {
-            Log.e(TAG, "Error reading health data", e)
+            onError(e)
         }
     }
 
