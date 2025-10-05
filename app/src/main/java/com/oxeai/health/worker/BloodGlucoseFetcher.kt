@@ -12,7 +12,7 @@ import com.oxeai.health.DataConfidence
 import com.oxeai.health.DataSource
 import com.oxeai.health.GlucoseContext
 
-class BloodGlucoseFetcher(private val context: Context) : HealthDataFetcher(context) {
+class BloodGlucoseFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getBloodGlucose() {
         try {
             val bloodGlucoseRequest = ReadRecordsRequest(

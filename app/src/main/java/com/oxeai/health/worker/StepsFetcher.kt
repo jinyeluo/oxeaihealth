@@ -9,7 +9,7 @@ import com.oxeai.health.DataSource
 import com.oxeai.health.StepsData
 import com.oxeai.health.TrackedMetric
 
-class StepsFetcher(private val context: Context) : HealthDataFetcher(context) {
+class StepsFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getSteps() {
         try {
             val stepsRequest = ReadRecordsRequest(

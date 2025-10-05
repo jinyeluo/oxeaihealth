@@ -14,7 +14,7 @@ import com.oxeai.health.NutrientAmount
 import com.oxeai.health.NutritionData
 import com.oxeai.health.NutritionHourly
 
-class NutritionFetcher(private val context: Context) : HealthDataFetcher(context) {
+class NutritionFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getNutrition() {
         try {
             val nutritionRequest = ReadRecordsRequest(

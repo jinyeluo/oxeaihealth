@@ -8,7 +8,7 @@ import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
 import com.oxeai.health.BodyFatData
 import com.oxeai.health.DataSource
 
-class BodyFatFetcher(private val context: Context) : HealthDataFetcher(context) {
+class BodyFatFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getBodyFat() {
         try {
             val bodyFatRequest = ReadRecordsRequest(

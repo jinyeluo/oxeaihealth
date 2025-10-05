@@ -11,7 +11,7 @@ import com.oxeai.health.DataConfidence
 import com.oxeai.health.DataSource
 import com.oxeai.health.TrackedMetric
 
-class BoneMassFetcher(private val context: Context) : HealthDataFetcher(context) {
+class BoneMassFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getBoneMass() {
         try {
             val boneMassRequest = ReadRecordsRequest(

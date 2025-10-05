@@ -1,0 +1,47 @@
+package com.oxeai.health.worker
+
+import android.content.Context
+import android.util.Log
+import androidx.health.connect.client.records.IntermenstrualBleedingRecord
+import androidx.health.connect.client.request.ReadRecordsRequest
+import androidx.health.connect.client.time.TimeRangeFilter
+import com.oxeai.health.ActivityMetadata
+import com.oxeai.health.DataConfidence
+import com.oxeai.health.DataSource
+import com.oxeai.health.IntermenstrualBleedingData
+
+class IntermenstrualBleedingFetcher(context: Context) : HealthDataFetcher(context) {
+
+    suspend fun getIntermenstrualBleeding() {
+        try {
+            val intermenstrualBleedingRequest = ReadRecordsRequest(
+                recordType = IntermenstrualBleedingRecord::class,
+                timeRangeFilter = TimeRangeFilter.Companion.between(startTime, endTime)
+            )
+            val intermenstrualBleedingRecords = healthConnectClient.readRecords(intermenstrualBleedingRequest)
+
+            val intermenstrualBleedingData = intermenstrualBleedingRecords.records.map { record ->
+                IntermenstrualBleedingData(
+                    userId = "user_id", // Replace with actual user ID
+                    timestamp = record.time,
+                    source = DataSource.GOOGLE,
+                    metadata = ActivityMetadata(
+                        devices = listOf(record.metadata.device?.manufacturer ?: "Unknown"),
+                        confidence = DataConfidence.HIGH
+                    )
+                )
+            }
+
+            intermenstrualBleedingData.forEach {
+                saveDataAsJson(it)
+                sendDataToApi(it)
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "Error reading intermenstrual bleeding data", e)
+        }
+    }
+
+    companion object {
+        private const val TAG = "IntermenstrualBleedingFetcher"
+    }
+}

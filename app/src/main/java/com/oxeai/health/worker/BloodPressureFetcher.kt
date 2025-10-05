@@ -11,7 +11,7 @@ import com.oxeai.health.DataConfidence
 import com.oxeai.health.DataSource
 import com.oxeai.health.TrackedMetric
 
-class BloodPressureFetcher(private val context: Context) : HealthDataFetcher(context) {
+class BloodPressureFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getBloodPressure() {
         try {
             val bloodPressureRequest = ReadRecordsRequest(

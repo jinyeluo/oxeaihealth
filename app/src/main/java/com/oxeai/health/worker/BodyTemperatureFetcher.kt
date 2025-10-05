@@ -11,7 +11,7 @@ import com.oxeai.health.DataConfidence
 import com.oxeai.health.DataSource
 import com.oxeai.health.TemperatureReading
 
-class BodyTemperatureFetcher(private val context: Context) : HealthDataFetcher(context) {
+class BodyTemperatureFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getBodyTemperature() {
         try {
             val bodyTemperatureRequest = ReadRecordsRequest(

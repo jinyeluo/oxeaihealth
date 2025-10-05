@@ -11,7 +11,7 @@ import com.oxeai.health.DataSource
 import com.oxeai.health.HeightData
 import com.oxeai.health.TrackedMetric
 
-class HeightFetcher(private val context: Context) : HealthDataFetcher(context) {
+class HeightFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getHeight() {
         try {
             val heightRequest = ReadRecordsRequest(

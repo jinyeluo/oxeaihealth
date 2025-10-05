@@ -1,6 +1,7 @@
 package com.oxeai.health.worker
 
 import android.content.Context
+import android.os.Environment
 import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
 import com.oxeai.health.BaseHealthData
@@ -11,7 +12,7 @@ import java.io.IOException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-open class HealthDataFetcher(private val context: Context) {
+open class HealthDataFetcher(context: Context) {
     protected val healthConnectClient = HealthConnectClient.getOrCreate(context)
     protected val endTime = Instant.now()
     protected val startTime = endTime.minus(1, ChronoUnit.HOURS)
@@ -19,7 +20,8 @@ open class HealthDataFetcher(private val context: Context) {
 
     protected fun saveDataAsJson(data: BaseHealthData) {
         try {
-            val file = File(context.filesDir, "health_data.json")
+            val file = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "health_data.json")
+//            val file = File(context.filesDir, "health_data.json")
             val writer = FileWriter(file, true) // Append to the file
             writer.append(Json.encodeToString(data)).append("\n")
             writer.flush()

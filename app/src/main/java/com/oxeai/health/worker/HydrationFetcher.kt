@@ -11,7 +11,7 @@ import com.oxeai.health.DataSource
 import com.oxeai.health.Hydration
 import com.oxeai.health.HydrationData
 
-class HydrationFetcher(private val context: Context) : HealthDataFetcher(context) {
+class HydrationFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getHydration() {
         try {
             val hydrationRequest = ReadRecordsRequest(

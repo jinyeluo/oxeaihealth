@@ -10,6 +10,8 @@ class HealthDataWorker(context: Context, workerParams: WorkerParameters) : Corou
 
     override suspend fun doWork(): Result {
         return try {
+            Log.d(TAG, "HealthDataWorker running ")
+
             aggregateHealthData()
             Result.success()
         } catch (e: Exception) {

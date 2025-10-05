@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
         setupWithNavController(binding!!.navView, navController)
 
         val workManager = WorkManager.getInstance(this)
-        val healthDataWorkRequest = PeriodicWorkRequest.Builder(HealthDataWorker::class, 1, TimeUnit.HOURS)
+        val healthDataWorkRequest = PeriodicWorkRequest.Builder(HealthDataWorker::class, 15, TimeUnit.MINUTES)
             .build()
         workManager.enqueueUniquePeriodicWork("HealthDataWorker", ExistingPeriodicWorkPolicy.KEEP, healthDataWorkRequest)
 

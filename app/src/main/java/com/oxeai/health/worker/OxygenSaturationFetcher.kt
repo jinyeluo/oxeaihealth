@@ -11,7 +11,7 @@ import com.oxeai.health.DataSource
 import com.oxeai.health.OxygenSaturation
 import com.oxeai.health.OxygenSaturationData
 
-class OxygenSaturationFetcher(private val context: Context) : HealthDataFetcher(context) {
+class OxygenSaturationFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getOxygenSaturation() {
         try {
             val oxygenSaturationRequest = ReadRecordsRequest(

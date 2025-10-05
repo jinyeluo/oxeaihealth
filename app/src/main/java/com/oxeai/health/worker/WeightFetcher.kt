@@ -11,7 +11,7 @@ import com.oxeai.health.DataSource
 import com.oxeai.health.TrackedMetric
 import com.oxeai.health.WeightData
 
-class WeightFetcher(private val context: Context) : HealthDataFetcher(context) {
+class WeightFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getWeight() {
         try {
             val weightRequest = ReadRecordsRequest(

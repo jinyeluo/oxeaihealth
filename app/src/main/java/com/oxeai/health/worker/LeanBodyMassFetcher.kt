@@ -8,7 +8,7 @@ import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
 import com.oxeai.health.DataSource
 import com.oxeai.health.LeanBodyMassData
 
-class LeanBodyMassFetcher(private val context: Context) : HealthDataFetcher(context) {
+class LeanBodyMassFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getLeanBodyMass() {
         try {
             val leanBodyMassRequest = ReadRecordsRequest(

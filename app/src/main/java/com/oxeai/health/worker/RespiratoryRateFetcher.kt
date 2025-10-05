@@ -11,7 +11,7 @@ import com.oxeai.health.DataSource
 import com.oxeai.health.RespiratoryRate
 import com.oxeai.health.RespiratoryRateData
 
-class RespiratoryRateFetcher(private val context: Context) : HealthDataFetcher(context) {
+class RespiratoryRateFetcher(context: Context) : HealthDataFetcher(context) {
     suspend fun getRespiratoryRate() {
         try {
             val respiratoryRateRequest = ReadRecordsRequest(
