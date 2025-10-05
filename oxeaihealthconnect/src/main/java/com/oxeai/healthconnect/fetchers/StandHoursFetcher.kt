@@ -11,8 +11,9 @@ import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.SimpleMetric
 import com.oxeai.healthconnect.models.StandHoursData
 import java.time.Duration
+import java.util.UUID
 
-class StandHoursFetcher(context: Context) : HealthDataFetcher(context) {
+class StandHoursFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getStandHours() {
         try {
@@ -29,7 +30,7 @@ class StandHoursFetcher(context: Context) : HealthDataFetcher(context) {
                 .sumOf { Duration.between(it.startTime, it.endTime).toHours() }
 
             val standHoursData = StandHoursData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 standHours = SimpleMetric(

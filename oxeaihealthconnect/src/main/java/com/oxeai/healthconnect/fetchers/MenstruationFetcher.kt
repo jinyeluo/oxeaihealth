@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.MenstruationData
+import java.util.UUID
 
-class MenstruationFetcher(context: Context) : HealthDataFetcher(context) {
+class MenstruationFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getMenstruation() {
         try {
@@ -22,7 +23,7 @@ class MenstruationFetcher(context: Context) : HealthDataFetcher(context) {
 
             val menstruationData = menstruationRecords.records.map { record ->
                 MenstruationData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     flow = record.flow.toString(),

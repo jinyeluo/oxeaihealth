@@ -12,7 +12,9 @@ import java.io.IOException
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-open class HealthDataFetcher(context: Context) {
+import java.util.UUID
+
+open class HealthDataFetcher(context: Context, protected val userId: UUID) {
     protected val healthConnectClient = HealthConnectClient.getOrCreate(context)
     protected val endTime = Instant.now()
     protected val startTime = endTime.minus(1, ChronoUnit.HOURS)

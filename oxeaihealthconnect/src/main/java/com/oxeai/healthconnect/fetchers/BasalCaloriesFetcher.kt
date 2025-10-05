@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.BasalCaloriesData
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.TrackedMeasurement
+import java.util.UUID
 
-class BasalCaloriesFetcher(context: Context) : HealthDataFetcher(context) {
+class BasalCaloriesFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getBasalCalories() {
         try {
@@ -22,7 +23,7 @@ class BasalCaloriesFetcher(context: Context) : HealthDataFetcher(context) {
             val avgBasalMetabolicRate = basalMetabolicRateRecords.records.map { it.basalMetabolicRate.inKilocaloriesPerDay }.average()
 
             val basalCaloriesData = BasalCaloriesData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 caloriesBasal = TrackedMeasurement(

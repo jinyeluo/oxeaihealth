@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.BloodPressureData
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.TrackedMetric
+import java.util.UUID
 
-class BloodPressureFetcher(context: Context) : HealthDataFetcher(context) {
+class BloodPressureFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getBloodPressure() {
         try {
             val bloodPressureRequest = ReadRecordsRequest(
@@ -23,7 +24,7 @@ class BloodPressureFetcher(context: Context) : HealthDataFetcher(context) {
             val diastolic = bloodPressureRecords.records.map { it.diastolic.inMillimetersOfMercury }.average()
 
             val bloodPressureData = BloodPressureData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 systolic = TrackedMetric(

@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.SpeedData
+import java.util.UUID
 
-class SpeedFetcher(context: Context) : HealthDataFetcher(context) {
+class SpeedFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getSpeed() {
         try {
@@ -22,7 +23,7 @@ class SpeedFetcher(context: Context) : HealthDataFetcher(context) {
             val avgSpeed = speedRecords.records.flatMap { it.samples }.map { it.speed.inMetersPerSecond }.average()
 
             val speedData = SpeedData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 averageSpeed = avgSpeed,

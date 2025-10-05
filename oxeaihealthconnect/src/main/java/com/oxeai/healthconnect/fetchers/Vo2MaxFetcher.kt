@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.Vo2MaxData
+import java.util.UUID
 
-class Vo2MaxFetcher(context: Context) : HealthDataFetcher(context) {
+class Vo2MaxFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getVo2Max() {
         try {
@@ -22,7 +23,7 @@ class Vo2MaxFetcher(context: Context) : HealthDataFetcher(context) {
             val avgVo2Max = vo2MaxRecords.records.map { it.vo2MillilitersPerMinuteKilogram }.average()
 
             val vo2MaxData = Vo2MaxData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 vo2Max = avgVo2Max,

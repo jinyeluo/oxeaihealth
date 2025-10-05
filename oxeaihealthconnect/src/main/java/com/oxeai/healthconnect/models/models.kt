@@ -2,10 +2,11 @@ package com.oxeai.healthconnect.models
 
 import kotlinx.serialization.Serializable
 import java.time.Instant
+import java.util.UUID
 
 @Serializable
 sealed class BaseHealthData {
-    abstract val userId: String
+    abstract val userId: UUID
 
     @Serializable(with = InstantSerializer::class)
     abstract val timestamp: Instant
@@ -15,7 +16,8 @@ sealed class BaseHealthData {
 
 @Serializable
 data class StepsData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -25,7 +27,8 @@ data class StepsData(
 
 @Serializable
 data class DistanceData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -35,7 +38,8 @@ data class DistanceData(
 
 @Serializable
 data class ActiveCaloriesData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -45,7 +49,8 @@ data class ActiveCaloriesData(
 
 @Serializable
 data class BasalCaloriesData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -55,7 +60,8 @@ data class BasalCaloriesData(
 
 @Serializable
 data class FloorsClimbedData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -65,7 +71,8 @@ data class FloorsClimbedData(
 
 @Serializable
 data class MoveMinutesData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -75,7 +82,8 @@ data class MoveMinutesData(
 
 @Serializable
 data class StandHoursData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -85,7 +93,8 @@ data class StandHoursData(
 
 @Serializable
 data class HeartRateData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -97,7 +106,8 @@ data class HeartRateData(
 
 @Serializable
 data class TotalCaloriesBurnedData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -107,7 +117,8 @@ data class TotalCaloriesBurnedData(
 
 @Serializable
 data class SpeedData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -117,7 +128,8 @@ data class SpeedData(
 
 @Serializable
 data class Vo2MaxData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -127,7 +139,8 @@ data class Vo2MaxData(
 
 @Serializable
 data class BasalMetabolicRateData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -137,7 +150,8 @@ data class BasalMetabolicRateData(
 
 @Serializable
 data class PowerData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -147,7 +161,8 @@ data class PowerData(
 
 @Serializable
 data class BodyFatData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -157,7 +172,8 @@ data class BodyFatData(
 
 @Serializable
 data class LeanBodyMassData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -167,7 +183,8 @@ data class LeanBodyMassData(
 
 @Serializable
 data class WeightData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -177,7 +194,8 @@ data class WeightData(
 
 @Serializable
 data class HeightData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -187,7 +205,8 @@ data class HeightData(
 
 @Serializable
 data class BoneMassData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -197,7 +216,8 @@ data class BoneMassData(
 
 @Serializable
 data class BloodPressureData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -208,7 +228,8 @@ data class BloodPressureData(
 
 @Serializable
 data class BloodGlucoseData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -218,7 +239,8 @@ data class BloodGlucoseData(
 
 @Serializable
 data class BodyTemperatureData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -228,7 +250,8 @@ data class BodyTemperatureData(
 
 @Serializable
 data class OxygenSaturationData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -238,7 +261,8 @@ data class OxygenSaturationData(
 
 @Serializable
 data class RespiratoryRateData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -248,7 +272,8 @@ data class RespiratoryRateData(
 
 @Serializable
 data class HydrationData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -258,7 +283,8 @@ data class HydrationData(
 
 @Serializable
 data class NutritionData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -268,7 +294,8 @@ data class NutritionData(
 
 @Serializable
 data class SleepSessionData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -283,7 +310,8 @@ data class SleepSessionData(
 
 @Serializable
 data class MenstruationData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -293,7 +321,8 @@ data class MenstruationData(
 
 @Serializable
 data class IntermenstrualBleedingData(
-    override val userId: String,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
@@ -335,7 +364,6 @@ enum class DataConfidence {
 
 @Serializable
 data class Nutrition(
-    val userId: String,
     @Serializable(with = InstantSerializer::class)
     val timestamp: Instant,
     val source: DataSource,

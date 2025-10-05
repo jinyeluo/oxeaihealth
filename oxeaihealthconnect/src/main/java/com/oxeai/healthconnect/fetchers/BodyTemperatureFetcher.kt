@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.BodyTemperatureData
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.TemperatureReading
+import java.util.UUID
 
-class BodyTemperatureFetcher(context: Context) : HealthDataFetcher(context) {
+class BodyTemperatureFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getBodyTemperature() {
         try {
             val bodyTemperatureRequest = ReadRecordsRequest(
@@ -22,7 +23,7 @@ class BodyTemperatureFetcher(context: Context) : HealthDataFetcher(context) {
 
             bodyTemperatureRecords.records.firstOrNull()?.let { record ->
                 val bodyTemperatureData = BodyTemperatureData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(

@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.PowerData
 import com.oxeai.healthconnect.models.TrackedMeasurement
+import java.util.UUID
 
-class PowerFetcher(context: Context) : HealthDataFetcher(context) {
+class PowerFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getPower() {
         try {
@@ -23,7 +24,7 @@ class PowerFetcher(context: Context) : HealthDataFetcher(context) {
             val totalPower = powerRecords.records.sumOf { it.samples.sumOf { it.power.inWatts } }
 
             val powerData = PowerData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 power = TrackedMeasurement(

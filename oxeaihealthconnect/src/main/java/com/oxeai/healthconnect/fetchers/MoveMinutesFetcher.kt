@@ -11,8 +11,9 @@ import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.MoveMinutesData
 import com.oxeai.healthconnect.models.TrackedMetric
 import kotlinx.coroutines.runBlocking
+import java.util.UUID
 
-class MoveMinutesFetcher(context: Context) : HealthDataFetcher(context) {
+class MoveMinutesFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getMoveMinutes() {
         try {
@@ -27,7 +28,7 @@ class MoveMinutesFetcher(context: Context) : HealthDataFetcher(context) {
             var totalMoveMinutes = MoveMinutesCalculator().calculateTotalMoveMinutes(exerciseSessions)
 
             val moveMinutesData = MoveMinutesData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 moveMinutes = TrackedMetric(

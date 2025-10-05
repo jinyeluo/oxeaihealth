@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.OxygenSaturation
 import com.oxeai.healthconnect.models.OxygenSaturationData
+import java.util.UUID
 
-class OxygenSaturationFetcher(context: Context) : HealthDataFetcher(context) {
+class OxygenSaturationFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getOxygenSaturation() {
         try {
             val oxygenSaturationRequest = ReadRecordsRequest(
@@ -22,7 +23,7 @@ class OxygenSaturationFetcher(context: Context) : HealthDataFetcher(context) {
 
             oxygenSaturationRecords.records.firstOrNull()?.let { record ->
                 val oxygenSaturationData = OxygenSaturationData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(

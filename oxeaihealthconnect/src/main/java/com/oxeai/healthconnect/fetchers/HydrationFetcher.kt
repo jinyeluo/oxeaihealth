@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.Hydration
 import com.oxeai.healthconnect.models.HydrationData
+import java.util.UUID
 
-class HydrationFetcher(context: Context) : HealthDataFetcher(context) {
+class HydrationFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getHydration() {
         try {
             val hydrationRequest = ReadRecordsRequest(
@@ -22,7 +23,7 @@ class HydrationFetcher(context: Context) : HealthDataFetcher(context) {
 
             hydrationRecords.records.firstOrNull()?.let { record ->
                 val hydrationData = HydrationData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.endTime,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(

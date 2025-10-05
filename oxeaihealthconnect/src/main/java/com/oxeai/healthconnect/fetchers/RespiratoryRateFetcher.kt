@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.RespiratoryRate
 import com.oxeai.healthconnect.models.RespiratoryRateData
+import java.util.UUID
 
-class RespiratoryRateFetcher(context: Context) : HealthDataFetcher(context) {
+class RespiratoryRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getRespiratoryRate() {
         try {
             val respiratoryRateRequest = ReadRecordsRequest(
@@ -22,7 +23,7 @@ class RespiratoryRateFetcher(context: Context) : HealthDataFetcher(context) {
 
             respiratoryRateRecords.records.firstOrNull()?.let { record ->
                 val respiratoryRateData = RespiratoryRateData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(

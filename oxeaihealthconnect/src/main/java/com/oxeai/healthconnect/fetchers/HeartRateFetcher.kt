@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.HeartRateData
+import java.util.UUID
 
-class HeartRateFetcher(context: Context) : HealthDataFetcher(context) {
+class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getHeartRate() {
         try {
@@ -25,7 +26,7 @@ class HeartRateFetcher(context: Context) : HealthDataFetcher(context) {
             val maxHeartRate = samples.maxOfOrNull { it.beatsPerMinute } ?: 0
 
             val heartRateData = HeartRateData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 averageBpm = avgHeartRate,

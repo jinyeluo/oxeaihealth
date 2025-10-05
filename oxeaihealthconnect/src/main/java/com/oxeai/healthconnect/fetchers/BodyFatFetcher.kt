@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.BodyFatData
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
+import java.util.UUID
 
-class BodyFatFetcher(context: Context) : HealthDataFetcher(context) {
+class BodyFatFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getBodyFat() {
         try {
             val bodyFatRequest = ReadRecordsRequest(
@@ -25,7 +26,7 @@ class BodyFatFetcher(context: Context) : HealthDataFetcher(context) {
             }
 
             val bodyFatData = BodyFatData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 bodyFatPercentage = averageBodyFat,

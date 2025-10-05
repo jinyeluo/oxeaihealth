@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.HeightData
 import com.oxeai.healthconnect.models.TrackedMetric
+import java.util.UUID
 
-class HeightFetcher(context: Context) : HealthDataFetcher(context) {
+class HeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getHeight() {
         try {
             val heightRequest = ReadRecordsRequest(
@@ -22,7 +23,7 @@ class HeightFetcher(context: Context) : HealthDataFetcher(context) {
             val totalHeight = heightRecords.records.sumOf { it.height.inMeters }
 
             val heightData = HeightData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 height = TrackedMetric(

@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.DistanceData
 import com.oxeai.healthconnect.models.TrackedMeasurement
+import java.util.UUID
 
-class DistanceFetcher(context: Context) : HealthDataFetcher(context) {
+class DistanceFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getDistance() {
         try {
@@ -23,7 +24,7 @@ class DistanceFetcher(context: Context) : HealthDataFetcher(context) {
             val totalDistance = distanceRecords.records.sumOf { it.distance.inMeters }
 
             val distanceData = DistanceData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 distance = TrackedMeasurement(

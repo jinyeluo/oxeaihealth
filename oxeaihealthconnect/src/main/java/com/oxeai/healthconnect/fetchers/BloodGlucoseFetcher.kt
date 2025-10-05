@@ -11,8 +11,9 @@ import com.oxeai.healthconnect.models.BloodGlucoseReading
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.GlucoseContext
+import java.util.UUID
 
-class BloodGlucoseFetcher(context: Context) : HealthDataFetcher(context) {
+class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getBloodGlucose() {
         try {
             val bloodGlucoseRequest = ReadRecordsRequest(
@@ -25,7 +26,7 @@ class BloodGlucoseFetcher(context: Context) : HealthDataFetcher(context) {
             // You might want to process all records or the most recent one.
             bloodGlucoseRecords.records.firstOrNull()?.let { record ->
                 val bloodGlucoseData = BloodGlucoseData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(

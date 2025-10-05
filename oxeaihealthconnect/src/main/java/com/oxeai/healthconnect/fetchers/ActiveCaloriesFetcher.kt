@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.TrackedMeasurement
+import java.util.UUID
 
-class ActiveCaloriesFetcher(context: Context) : HealthDataFetcher(context) {
+class ActiveCaloriesFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getActiveCalories() {
         try {
@@ -23,7 +24,7 @@ class ActiveCaloriesFetcher(context: Context) : HealthDataFetcher(context) {
             val totalActiveCalories = activeCaloriesRecords.records.sumOf { it.energy.inCalories }
 
             val activeCaloriesData = ActiveCaloriesData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 caloriesActive = TrackedMeasurement(

@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.TrackedMetric
 import com.oxeai.healthconnect.models.WeightData
+import java.util.UUID
 
-class WeightFetcher(context: Context) : HealthDataFetcher(context) {
+class WeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getWeight() {
         try {
             val weightRequest = ReadRecordsRequest(
@@ -22,7 +23,7 @@ class WeightFetcher(context: Context) : HealthDataFetcher(context) {
             val totalWeight = weightRecords.records.sumOf { it.weight.inKilograms }
 
             val weightData = WeightData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 weight = TrackedMetric(

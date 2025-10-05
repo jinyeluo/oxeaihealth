@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.FloorsClimbedData
 import com.oxeai.healthconnect.models.TrackedMetric
+import java.util.UUID
 
-class FloorsClimbedFetcher(context: Context) : HealthDataFetcher(context) {
+class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getFloorsClimbed() {
         try {
@@ -23,7 +24,7 @@ class FloorsClimbedFetcher(context: Context) : HealthDataFetcher(context) {
             val totalFloorsClimbed = floorsClimbedRecords.records.sumOf { it.floors.toInt() }
 
             val floorsClimbedData = FloorsClimbedData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 floorsClimbed = TrackedMetric(

@@ -5,14 +5,16 @@ import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import kotlinx.coroutines.coroutineScope
+import java.util.UUID
 
 class HealthDataWorker(context: Context, workerParams: WorkerParameters) : CoroutineWorker(context, workerParams) {
 
     override suspend fun doWork(): Result {
+        val userId = UUID(0, 0)
         return try {
             Log.d(TAG, "HealthDataWorker running ")
 
-            aggregateHealthData()
+            aggregateHealthData(userId)
             Result.success()
         } catch (e: Exception) {
             Log.e(TAG, "Error in doWork", e)
@@ -20,35 +22,35 @@ class HealthDataWorker(context: Context, workerParams: WorkerParameters) : Corou
         }
     }
 
-    private suspend fun aggregateHealthData() = coroutineScope {
-        val stepsFetcher = StepsFetcher(applicationContext)
-        val distanceFetcher = DistanceFetcher(applicationContext)
-        val activeCaloriesFetcher = ActiveCaloriesFetcher(applicationContext)
-        val basalCaloriesFetcher = BasalCaloriesFetcher(applicationContext)
-        val floorsClimbedFetcher = FloorsClimbedFetcher(applicationContext)
-        val moveMinutesFetcher = MoveMinutesFetcher(applicationContext)
-        val standHoursFetcher = StandHoursFetcher(applicationContext)
-        val heartRateFetcher = HeartRateFetcher(applicationContext)
-        val totalCaloriesBurnedFetcher = TotalCaloriesBurnedFetcher(applicationContext)
-        val speedFetcher = SpeedFetcher(applicationContext)
-        val vo2MaxFetcher = Vo2MaxFetcher(applicationContext)
-        val bodyFatFetcher = BodyFatFetcher(applicationContext)
-        val leanBodyMassFetcher = LeanBodyMassFetcher(applicationContext)
-        val weightFetcher = WeightFetcher(applicationContext)
-        val heightFetcher = HeightFetcher(applicationContext)
-        val boneMassFetcher = BoneMassFetcher(applicationContext)
-        val bloodPressureFetcher = BloodPressureFetcher(applicationContext)
-        val bloodGlucoseFetcher = BloodGlucoseFetcher(applicationContext)
-        val bodyTemperatureFetcher = BodyTemperatureFetcher(applicationContext)
-        val oxygenSaturationFetcher = OxygenSaturationFetcher(applicationContext)
-        val respiratoryRateFetcher = RespiratoryRateFetcher(applicationContext)
-        val hydrationFetcher = HydrationFetcher(applicationContext)
-        val nutritionFetcher = NutritionFetcher(applicationContext)
-        val basalMetabolicRateFetcher = BasalMetabolicRateFetcher(applicationContext)
-        val powerFetcher = PowerFetcher(applicationContext)
-        val sleepSessionFetcher = SleepSessionFetcher(applicationContext)
-        val menstruationFetcher = MenstruationFetcher(applicationContext)
-        val intermenstrualBleedingFetcher = IntermenstrualBleedingFetcher(applicationContext)
+    private suspend fun aggregateHealthData(userId: UUID) = coroutineScope {
+        val stepsFetcher = StepsFetcher(applicationContext, userId)
+        val distanceFetcher = DistanceFetcher(applicationContext, userId)
+        val activeCaloriesFetcher = ActiveCaloriesFetcher(applicationContext, userId)
+        val basalCaloriesFetcher = BasalCaloriesFetcher(applicationContext, userId)
+        val floorsClimbedFetcher = FloorsClimbedFetcher(applicationContext, userId)
+        val moveMinutesFetcher = MoveMinutesFetcher(applicationContext, userId)
+        val standHoursFetcher = StandHoursFetcher(applicationContext, userId)
+        val heartRateFetcher = HeartRateFetcher(applicationContext, userId)
+        val totalCaloriesBurnedFetcher = TotalCaloriesBurnedFetcher(applicationContext, userId)
+        val speedFetcher = SpeedFetcher(applicationContext, userId)
+        val vo2MaxFetcher = Vo2MaxFetcher(applicationContext, userId)
+        val bodyFatFetcher = BodyFatFetcher(applicationContext, userId)
+        val leanBodyMassFetcher = LeanBodyMassFetcher(applicationContext, userId)
+        val weightFetcher = WeightFetcher(applicationContext, userId)
+        val heightFetcher = HeightFetcher(applicationContext, userId)
+        val boneMassFetcher = BoneMassFetcher(applicationContext, userId)
+        val bloodPressureFetcher = BloodPressureFetcher(applicationContext, userId)
+        val bloodGlucoseFetcher = BloodGlucoseFetcher(applicationContext, userId)
+        val bodyTemperatureFetcher = BodyTemperatureFetcher(applicationContext, userId)
+        val oxygenSaturationFetcher = OxygenSaturationFetcher(applicationContext, userId)
+        val respiratoryRateFetcher = RespiratoryRateFetcher(applicationContext, userId)
+        val hydrationFetcher = HydrationFetcher(applicationContext, userId)
+        val nutritionFetcher = NutritionFetcher(applicationContext, userId)
+        val basalMetabolicRateFetcher = BasalMetabolicRateFetcher(applicationContext, userId)
+        val powerFetcher = PowerFetcher(applicationContext, userId)
+        val sleepSessionFetcher = SleepSessionFetcher(applicationContext, userId)
+        val menstruationFetcher = MenstruationFetcher(applicationContext, userId)
+        val intermenstrualBleedingFetcher = IntermenstrualBleedingFetcher(applicationContext, userId)
 
         stepsFetcher.getSteps()
         distanceFetcher.getDistance()

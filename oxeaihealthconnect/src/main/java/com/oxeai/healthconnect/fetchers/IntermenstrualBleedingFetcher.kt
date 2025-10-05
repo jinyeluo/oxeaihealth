@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.IntermenstrualBleedingData
+import java.util.UUID
 
-class IntermenstrualBleedingFetcher(context: Context) : HealthDataFetcher(context) {
+class IntermenstrualBleedingFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getIntermenstrualBleeding() {
         try {
@@ -22,7 +23,7 @@ class IntermenstrualBleedingFetcher(context: Context) : HealthDataFetcher(contex
 
             val intermenstrualBleedingData = intermenstrualBleedingRecords.records.map { record ->
                 IntermenstrualBleedingData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(

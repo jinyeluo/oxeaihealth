@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.LeanBodyMassData
+import java.util.UUID
 
-class LeanBodyMassFetcher(context: Context) : HealthDataFetcher(context) {
+class LeanBodyMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getLeanBodyMass() {
         try {
             val leanBodyMassRequest = ReadRecordsRequest(
@@ -25,7 +26,7 @@ class LeanBodyMassFetcher(context: Context) : HealthDataFetcher(context) {
             }
 
             val leanBodyMassData = LeanBodyMassData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 leanBodyMass = averageLeanBodyMass,

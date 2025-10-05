@@ -11,7 +11,9 @@ import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.StepsData
 import com.oxeai.healthconnect.models.TrackedMetric
 
-class StepsFetcher(context: Context) : HealthDataFetcher(context) {
+import java.util.UUID
+
+class StepsFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getSteps() {
         try {
             val stepsRequest = ReadRecordsRequest(
@@ -22,7 +24,7 @@ class StepsFetcher(context: Context) : HealthDataFetcher(context) {
             val totalSteps = stepsRecords.records.sumOf { it.count }
 
             val stepsData = StepsData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 steps = TrackedMetric(

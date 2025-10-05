@@ -13,8 +13,9 @@ import com.oxeai.healthconnect.models.Macronutrients
 import com.oxeai.healthconnect.models.NutrientAmount
 import com.oxeai.healthconnect.models.Nutrition
 import com.oxeai.healthconnect.models.NutritionData
+import java.util.UUID
 
-class NutritionFetcher(context: Context) : HealthDataFetcher(context) {
+class NutritionFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getNutrition() {
         try {
             val nutritionRequest = ReadRecordsRequest(
@@ -25,7 +26,7 @@ class NutritionFetcher(context: Context) : HealthDataFetcher(context) {
 
             nutritionRecords.records.firstOrNull()?.let { record ->
                 val nutritionData = NutritionData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.startTime,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(
@@ -33,7 +34,6 @@ class NutritionFetcher(context: Context) : HealthDataFetcher(context) {
                         confidence = DataConfidence.HIGH
                     ),
                     nutrition = Nutrition(
-                        userId = "user_id",
                         timestamp = record.startTime,
                         source = DataSource.GOOGLE,
                         calories = CaloriesConsumed(

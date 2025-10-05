@@ -9,8 +9,9 @@ import com.oxeai.healthconnect.models.ActivityMetadata
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.SleepSessionData
+import java.util.UUID
 
-class SleepSessionFetcher(context: Context) : HealthDataFetcher(context) {
+class SleepSessionFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
 
     suspend fun getSleepSession() {
         try {
@@ -22,7 +23,7 @@ class SleepSessionFetcher(context: Context) : HealthDataFetcher(context) {
 
             val sleepSessions = sleepSessionRecords.records.map { record ->
                 SleepSessionData(
-                    userId = "user_id", // Replace with actual user ID
+                    userId = userId,
                     timestamp = record.startTime,
                     source = DataSource.GOOGLE,
                     startTime = record.startTime,

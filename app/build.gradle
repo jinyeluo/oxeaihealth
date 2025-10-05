@@ -45,6 +45,8 @@ dependencies {
    implementation libs.play.services.auth
    implementation libs.core.ktx
    implementation libs.bson
+   implementation libs.health.connect
+
    // Kotlinx Serialization
    implementation libs.kotlinx.serialization.json
    implementation project(':oxeaihealthconnect')

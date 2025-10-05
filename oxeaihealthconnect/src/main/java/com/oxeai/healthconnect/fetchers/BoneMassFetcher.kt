@@ -10,8 +10,9 @@ import com.oxeai.healthconnect.models.BoneMassData
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.TrackedMetric
+import java.util.UUID
 
-class BoneMassFetcher(context: Context) : HealthDataFetcher(context) {
+class BoneMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
     suspend fun getBoneMass() {
         try {
             val boneMassRequest = ReadRecordsRequest(
@@ -22,7 +23,7 @@ class BoneMassFetcher(context: Context) : HealthDataFetcher(context) {
             val totalBoneMass = boneMassRecords.records.sumOf { it.mass.inKilograms }
 
             val boneMassData = BoneMassData(
-                userId = "user_id", // Replace with actual user ID
+                userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 boneMass = TrackedMetric(
