@@ -25,7 +25,6 @@ class HealthDataWorker(context: Context, workerParams: WorkerParameters) : Corou
     private suspend fun aggregateHealthData(userId: UUID) = coroutineScope {
         val stepsFetcher = StepsFetcher(applicationContext, userId)
         val distanceFetcher = DistanceFetcher(applicationContext, userId)
-        val basalCaloriesFetcher = BasalCaloriesFetcher(applicationContext, userId)
         val floorsClimbedFetcher = FloorsClimbedFetcher(applicationContext, userId)
         val moveMinutesFetcher = MoveMinutesFetcher(applicationContext, userId)
         val standHoursFetcher = StandHoursFetcher(applicationContext, userId)
@@ -53,7 +52,6 @@ class HealthDataWorker(context: Context, workerParams: WorkerParameters) : Corou
 
         stepsFetcher.getSteps()
         distanceFetcher.getDistance()
-        basalCaloriesFetcher.getBasalCalories()
         floorsClimbedFetcher.getFloorsClimbed()
         moveMinutesFetcher.getMoveMinutes()
         standHoursFetcher.getStandHours()

@@ -38,7 +38,7 @@ class SleepSessionFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
                     duration = record.endTime.toEpochMilli() - record.startTime.toEpochMilli(),
                     stages = record.stages.joinToString { it.stage.toString() },
                     metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device?.manufacturer ?: "Unknown"),
+                        devices = getDeviceModels(sleepSessionRecords),
                         confidence = DataConfidence.HIGH
                     )
                 )

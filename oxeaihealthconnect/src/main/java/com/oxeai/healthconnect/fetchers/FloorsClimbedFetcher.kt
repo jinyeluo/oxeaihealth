@@ -36,10 +36,9 @@ class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher(c
                 source = DataSource.GOOGLE,
                 floorsClimbed = TrackedMetric(
                     count = totalFloorsClimbed,
-                    sources = listOf("GoogleFit")
                 ),
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(floorsClimbedRecords),
                     confidence = DataConfidence.HIGH
                 )
             )

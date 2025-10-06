@@ -50,10 +50,14 @@ open class HealthDataFetcher(context: Context, protected val userId: UUID) {
 
     companion object {
         private const val TAG = "HealthDataFetcher"
-        fun <T : Record> getDeviceModels(stepsRecords: ReadRecordsResponse<T>): List<String> {
-            return stepsRecords.records
+        fun <T : Record> getDeviceModels(response: ReadRecordsResponse<T>): List<String> {
+            return response.records
                 .mapNotNull { it.metadata.device?.model }
                 .distinct()
         }
     }
+}
+
+fun Double.isZero(epsilon: Double = 1e-10): Boolean {
+    return kotlin.math.abs(this) < epsilon
 }

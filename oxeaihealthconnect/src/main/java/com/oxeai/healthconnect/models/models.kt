@@ -19,6 +19,7 @@ abstract class IntervalHealthData : BaseHealthData() {
     abstract val startTime: Instant
     abstract val endTime: Instant
 }
+
 @Serializable
 data class StepsData(
     @Serializable(with = UUIDSerializer::class)
@@ -173,6 +174,14 @@ data class PowerData(
     val power: TrackedMeasurement
 ) : BaseHealthData()
 
+
+@Serializable
+data class BodyFat(
+    val percentage: Double,
+    @Serializable(with = InstantSerializer::class)
+    val recordedAt: Instant
+)
+
 @Serializable
 data class BodyFatData(
     @Serializable(with = UUIDSerializer::class)
@@ -181,7 +190,7 @@ data class BodyFatData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val bodyFatPercentage: Double
+    val bodyFatPercentages: List<BodyFat>
 ) : BaseHealthData()
 
 @Serializable
@@ -229,6 +238,15 @@ data class BoneMassData(
 ) : BaseHealthData()
 
 @Serializable
+data class BloodPressure(
+    val systolic: Int,
+    val diastolic: Int,
+    val unit: String,
+    @Serializable(with = InstantSerializer::class)
+    val recordedAt: Instant
+)
+
+@Serializable
 data class BloodPressureData(
     @Serializable(with = UUIDSerializer::class)
     override val userId: UUID,
@@ -236,8 +254,7 @@ data class BloodPressureData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val systolic: TrackedMetric,
-    val diastolic: TrackedMetric
+    val bloodPressure: List<BloodPressure>
 ) : BaseHealthData()
 
 @Serializable
@@ -259,7 +276,7 @@ data class BodyTemperatureData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val bodyTemperature: TemperatureReading
+    val bodyTemperature: List<TemperatureReading>
 ) : BaseHealthData()
 
 @Serializable
@@ -423,9 +440,6 @@ data class Micronutrients(
     val cholesterol: Double? = null
 )
 
-enum class MealType {
-    BREAKFAST, LUNCH, DINNER, SNACK
-}
 
 @Serializable
 data class OxygenSaturation(
@@ -450,15 +464,26 @@ data class RespiratoryRate(
 )
 
 @Serializable
+data class GlucoseContext(
+    val mealType: MealType,
+    var relationToMeal: RelationToMeal
+)
+
+
+@Serializable
 data class BloodGlucoseReading(
     val value: Double,
-    val unit: String, // 'mg/dL', 'mmol/L'
+    val unit: String, // 'mg/dL',
     val context: GlucoseContext,
     @Serializable(with = InstantSerializer::class)
     val recordedAt: Instant
 )
 
-enum class GlucoseContext {
-    FASTING, POST_MEAL, RANDOM
+enum class MealType {
+    BREAKFAST, LUNCH, DINNER, SNACK, UNKNOWN
+}
+
+enum class RelationToMeal {
+    GENERAL, FASTING, BEFORE_MEAL, AFTER_MEAL, UNKNOWN
 }
 

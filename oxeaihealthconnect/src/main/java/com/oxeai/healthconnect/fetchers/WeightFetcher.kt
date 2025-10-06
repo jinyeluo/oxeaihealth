@@ -35,10 +35,9 @@ class WeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context,
                 source = DataSource.GOOGLE,
                 weight = TrackedMetric(
                     count = totalWeight.toInt(),
-                    sources = listOf("GoogleFit")
                 ),
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(weightRecords),
                     confidence = DataConfidence.HIGH
                 )
             )

@@ -34,7 +34,7 @@ class OxygenSaturationFetcher(context: Context, userId: UUID) : HealthDataFetche
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device.toString()),
+                        devices = getDeviceModels(oxygenSaturationRecords),
                         confidence = DataConfidence.HIGH
                     ),
                     oxygenSaturation = OxygenSaturation(

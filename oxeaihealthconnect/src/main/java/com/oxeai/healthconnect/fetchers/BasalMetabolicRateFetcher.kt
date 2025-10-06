@@ -28,27 +28,28 @@ class BasalMetabolicRateFetcher(context: Context, userId: UUID) : HealthDataFetc
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
             )
             val basalMetabolicRateRecords = healthConnectClient.readRecords(basalMetabolicRateRequest)
-            val totalBasalMetabolicRate = basalMetabolicRateRecords.records.sumOf { it.basalMetabolicRate.inKilocaloriesPerDay }
 
-            val basalMetabolicRateData = BasalMetabolicRateData(
-                userId = userId,
-                timestamp = endTime,
-                source = DataSource.GOOGLE,
-                basalMetabolicRate = TrackedMeasurement(
-                    value = totalBasalMetabolicRate,
-                    unit = "calories/day",
-                    sources = listOf("GoogleFit")
-                ),
-                metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
-                    confidence = DataConfidence.HIGH
-                )
-            )
-
-            saveDataAsJson(basalMetabolicRateData)
-            sendDataToApi(basalMetabolicRateData)
+            if (basalMetabolicRateRecords.records.isNotEmpty()) {
+                for (record in basalMetabolicRateRecords.records) {
+                    val basalMetabolicRateData = BasalMetabolicRateData(
+                        userId = userId,
+                        timestamp = endTime,
+                        source = DataSource.GOOGLE,
+                        basalMetabolicRate = TrackedMeasurement(
+                            value = record.basalMetabolicRate.inKilocaloriesPerDay,
+                            unit = "kcal/day",
+                        ),
+                        metadata = ActivityMetadata(
+                            devices = getDeviceModels(basalMetabolicRateRecords),
+                            confidence = DataConfidence.HIGH
+                        )
+                    )
+                    saveDataAsJson(basalMetabolicRateData)
+                    sendDataToApi(basalMetabolicRateData)
+                }
+            }
         } catch (e: Exception) {
-            onError(e)
+            Log.e(TAG, "Error reading basal metabolic rate data", e)
         }
     }
 

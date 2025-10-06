@@ -35,10 +35,9 @@ class BoneMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(contex
                 source = DataSource.GOOGLE,
                 boneMass = TrackedMetric(
                     count = totalBoneMass.toInt(),
-                    sources = listOf("GoogleFit")
                 ),
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(boneMassRecords),
                     confidence = DataConfidence.HIGH
                 )
             )

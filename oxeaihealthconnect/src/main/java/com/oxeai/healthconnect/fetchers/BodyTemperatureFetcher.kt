@@ -27,26 +27,31 @@ class BodyTemperatureFetcher(context: Context, userId: UUID) : HealthDataFetcher
                 timeRangeFilter = between(startTime, endTime)
             )
             val bodyTemperatureRecords = healthConnectClient.readRecords(bodyTemperatureRequest)
+            if (bodyTemperatureRecords.records.isEmpty()) {
+                return
+            }
 
-            bodyTemperatureRecords.records.firstOrNull()?.let { record ->
-                val bodyTemperatureData = BodyTemperatureData(
-                    userId = userId,
-                    timestamp = record.time,
-                    source = DataSource.GOOGLE,
-                    metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device.toString()),
-                        confidence = DataConfidence.HIGH
-                    ),
-                    bodyTemperature = TemperatureReading(
+            val bodyTemperatureData = BodyTemperatureData(
+                userId = userId,
+                timestamp = endTime,
+                source = DataSource.GOOGLE,
+                metadata = ActivityMetadata(
+                    devices = getDeviceModels(bodyTemperatureRecords),
+                    confidence = DataConfidence.HIGH
+                ),
+                bodyTemperature = ArrayList()
+            )
+            bodyTemperatureRecords.records.forEach { record ->
+                bodyTemperatureData.bodyTemperature.plus(
+                    TemperatureReading(
                         value = record.temperature.inCelsius,
                         unit = "celsius",
                         recordedAt = record.time
                     )
                 )
-                saveDataAsJson(bodyTemperatureData)
-                sendDataToApi(bodyTemperatureData)
             }
-
+            saveDataAsJson(bodyTemperatureData)
+            sendDataToApi(bodyTemperatureData)
         } catch (e: Exception) {
             onError(e)
         }

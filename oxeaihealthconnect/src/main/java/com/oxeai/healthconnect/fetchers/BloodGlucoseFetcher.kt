@@ -12,6 +12,12 @@ import com.oxeai.healthconnect.models.BloodGlucoseReading
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.GlucoseContext
+import com.oxeai.healthconnect.models.MealType.BREAKFAST
+import com.oxeai.healthconnect.models.MealType.DINNER
+import com.oxeai.healthconnect.models.MealType.LUNCH
+import com.oxeai.healthconnect.models.MealType.SNACK
+import com.oxeai.healthconnect.models.MealType.UNKNOWN
+import com.oxeai.healthconnect.models.RelationToMeal
 import java.util.UUID
 
 class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
@@ -29,26 +35,30 @@ class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
             )
             val bloodGlucoseRecords = healthConnectClient.readRecords(bloodGlucoseRequest)
 
-            // In this example, we're just taking the first record if it exists.
-            // You might want to process all records or the most recent one.
+            // just use the first record. I cannot think of a reason to get them all
             bloodGlucoseRecords.records.firstOrNull()?.let { record ->
                 val bloodGlucoseData = BloodGlucoseData(
                     userId = userId,
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device.toString()),
+                        devices = getDeviceModels(bloodGlucoseRecords),
                         confidence = DataConfidence.HIGH
                     ),
                     bloodGlucose = BloodGlucoseReading(
                         value = record.level.inMilligramsPerDeciliter,
                         unit = "mg/dL",
-                        context = GlucoseContext.RANDOM, // This is an assumption, you might need to map it
+                        context = GlucoseContext(record.mealType.toMealType(), record.relationToMeal.toRelationToMeal()),
                         recordedAt = record.time
                     )
                 )
-                saveDataAsJson(bloodGlucoseData)
-                sendDataToApi(bloodGlucoseData)
+
+                if (record.level.inMilligramsPerDeciliter.isZero()) {
+                    Log.w(TAG, "Blood glucose reading is zero. Ignoring.")
+                } else {
+                    saveDataAsJson(bloodGlucoseData)
+                    sendDataToApi(bloodGlucoseData)
+                }
             }
 
         } catch (e: Exception) {
@@ -58,5 +68,26 @@ class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
 
     companion object {
         private const val TAG = "BloodGlucoseFetcher"
+
+        fun Int.toRelationToMeal(): RelationToMeal {
+            return when (this) {
+                BloodGlucoseRecord.RELATION_TO_MEAL_GENERAL -> RelationToMeal.GENERAL
+                BloodGlucoseRecord.RELATION_TO_MEAL_FASTING -> RelationToMeal.FASTING
+                BloodGlucoseRecord.RELATION_TO_MEAL_BEFORE_MEAL -> RelationToMeal.BEFORE_MEAL
+                BloodGlucoseRecord.RELATION_TO_MEAL_AFTER_MEAL -> RelationToMeal.AFTER_MEAL
+                else -> RelationToMeal.UNKNOWN
+            }
+        }
+
+        fun Int.toMealType(): com.oxeai.healthconnect.models.MealType {
+            return when (this) {
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_BREAKFAST -> BREAKFAST
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_LUNCH -> LUNCH
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_DINNER -> DINNER
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_SNACK -> SNACK
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_UNKNOWN -> UNKNOWN
+                else -> UNKNOWN
+            }
+        }
     }
 }

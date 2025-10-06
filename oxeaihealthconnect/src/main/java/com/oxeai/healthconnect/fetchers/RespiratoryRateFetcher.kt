@@ -34,7 +34,7 @@ class RespiratoryRateFetcher(context: Context, userId: UUID) : HealthDataFetcher
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device.toString()),
+                        devices = getDeviceModels(respiratoryRateRecords),
                         confidence = DataConfidence.HIGH
                     ),
                     respiratoryRate = RespiratoryRate(

@@ -37,7 +37,6 @@ class DistanceFetcher(context: Context, userId: UUID) : HealthDataFetcher(contex
                 distance = TrackedMeasurement(
                     value = totalDistance,
                     unit = "meters",
-                    sources = listOf("GoogleFit")
                 ),
                 metadata = ActivityMetadata(
                     devices = listOf("Unknown"),

@@ -38,7 +38,7 @@ class LeanBodyMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
                 source = DataSource.GOOGLE,
                 leanBodyMass = averageLeanBodyMass,
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(leanBodyMassRecords),
                     confidence = DataConfidence.HIGH
                 )
             )

@@ -35,7 +35,7 @@ class SpeedFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
                 source = DataSource.GOOGLE,
                 averageSpeed = avgSpeed,
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(speedRecords),
                     confidence = DataConfidence.HIGH
                 )
             )

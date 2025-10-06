@@ -7,6 +7,7 @@ import androidx.health.connect.client.records.BodyFatRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
 import com.oxeai.healthconnect.models.ActivityMetadata
+import com.oxeai.healthconnect.models.BodyFat
 import com.oxeai.healthconnect.models.BodyFatData
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
@@ -26,9 +27,8 @@ class BodyFatFetcher(context: Context, userId: UUID) : HealthDataFetcher(context
                 timeRangeFilter = between(startTime, endTime)
             )
             val bodyFatRecords = healthConnectClient.readRecords(bodyFatRequest)
-            val averageBodyFat = bodyFatRecords.records.map { it.percentage.value }.average()
 
-            if (averageBodyFat.isNaN()) {
+            if (bodyFatRecords.records.isEmpty()) {
                 return
             }
 
@@ -36,12 +36,16 @@ class BodyFatFetcher(context: Context, userId: UUID) : HealthDataFetcher(context
                 userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
-                bodyFatPercentage = averageBodyFat,
+                bodyFatPercentages = ArrayList(),
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(bodyFatRecords),
                     confidence = DataConfidence.HIGH
                 )
             )
+
+            for (record in bodyFatRecords.records) {
+                bodyFatData.bodyFatPercentages.plus(BodyFat(record.percentage.value, record.time))
+            }
 
             saveDataAsJson(bodyFatData)
             sendDataToApi(bodyFatData)

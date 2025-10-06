@@ -40,7 +40,7 @@ class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(conte
                 minBpm = minHeartRate,
                 maxBpm = maxHeartRate,
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(heartRateRecords),
                     confidence = DataConfidence.HIGH
                 )
             )

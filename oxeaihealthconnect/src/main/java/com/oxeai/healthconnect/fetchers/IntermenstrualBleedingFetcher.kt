@@ -34,7 +34,7 @@ class IntermenstrualBleedingFetcher(context: Context, userId: UUID) : HealthData
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device?.manufacturer ?: "Unknown"),
+                        devices = getDeviceModels(intermenstrualBleedingRecords),
                         confidence = DataConfidence.HIGH
                     )
                 )

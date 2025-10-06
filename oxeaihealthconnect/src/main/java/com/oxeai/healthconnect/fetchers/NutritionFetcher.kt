@@ -37,7 +37,7 @@ class NutritionFetcher(context: Context, userId: UUID) : HealthDataFetcher(conte
                     timestamp = record.startTime,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device.toString()),
+                        devices = getDeviceModels(nutritionRecords),
                         confidence = DataConfidence.HIGH
                     ),
                     nutrition = Nutrition(

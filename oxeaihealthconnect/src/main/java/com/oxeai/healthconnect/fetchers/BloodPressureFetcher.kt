@@ -7,10 +7,10 @@ import androidx.health.connect.client.records.BloodPressureRecord
 import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
 import com.oxeai.healthconnect.models.ActivityMetadata
+import com.oxeai.healthconnect.models.BloodPressure
 import com.oxeai.healthconnect.models.BloodPressureData
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
-import com.oxeai.healthconnect.models.TrackedMetric
 import java.util.UUID
 
 class BloodPressureFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
@@ -27,26 +27,31 @@ class BloodPressureFetcher(context: Context, userId: UUID) : HealthDataFetcher(c
                 timeRangeFilter = between(startTime, endTime)
             )
             val bloodPressureRecords = healthConnectClient.readRecords(bloodPressureRequest)
-            val systolic = bloodPressureRecords.records.map { it.systolic.inMillimetersOfMercury }.average()
-            val diastolic = bloodPressureRecords.records.map { it.diastolic.inMillimetersOfMercury }.average()
+
+            if (bloodPressureRecords.records.isEmpty()) {
+                return
+            }
 
             val bloodPressureData = BloodPressureData(
                 userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
-                systolic = TrackedMetric(
-                    count = systolic.toInt(),
-                    sources = listOf("GoogleFit")
-                ),
-                diastolic = TrackedMetric(
-                    count = diastolic.toInt(),
-                    sources = listOf("GoogleFit")
-                ),
+                bloodPressure = ArrayList(),
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(bloodPressureRecords),
                     confidence = DataConfidence.HIGH
                 )
             )
+            for (record in bloodPressureRecords.records) {
+                bloodPressureData.bloodPressure.plus(
+                    BloodPressure(
+                        record.systolic.inMillimetersOfMercury.toInt(),
+                        record.diastolic.inMillimetersOfMercury.toInt(),
+                        unit = "mmHg",
+                        recordedAt = record.time
+                    ),
+                )
+            }
 
             saveDataAsJson(bloodPressureData)
             sendDataToApi(bloodPressureData)

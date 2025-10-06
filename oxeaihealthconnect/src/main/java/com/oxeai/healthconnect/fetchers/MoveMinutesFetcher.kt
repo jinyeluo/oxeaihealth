@@ -11,7 +11,6 @@ import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.MoveMinutesData
 import com.oxeai.healthconnect.models.TrackedMetric
-import kotlinx.coroutines.runBlocking
 import java.util.UUID
 
 class MoveMinutesFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
@@ -28,11 +27,10 @@ class MoveMinutesFetcher(context: Context, userId: UUID) : HealthDataFetcher(con
                 ExerciseSessionRecord::class,
                 between(startTime, endTime)
             )
-            val exerciseSessions: List<ExerciseSessionRecord> = runBlocking {
-                healthConnectClient.readRecords(exerciseSessionRequest).records
-            }
+            val exerciseSessions = healthConnectClient.readRecords(exerciseSessionRequest)
+
             // todo: save exercise sessions instead of just total move minutes
-            var totalMoveMinutes = MoveMinutesCalculator().calculateTotalMoveMinutes(exerciseSessions)
+            var totalMoveMinutes = MoveMinutesCalculator().calculateTotalMoveMinutes(exerciseSessions.records)
 
             val moveMinutesData = MoveMinutesData(
                 userId = userId,
@@ -40,10 +38,9 @@ class MoveMinutesFetcher(context: Context, userId: UUID) : HealthDataFetcher(con
                 source = DataSource.GOOGLE,
                 moveMinutes = TrackedMetric(
                     count = totalMoveMinutes.toInt(),
-                    sources = listOf("GoogleFit")
                 ),
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(exerciseSessions),
                     confidence = DataConfidence.HIGH
                 )
             )

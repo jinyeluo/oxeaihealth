@@ -35,7 +35,6 @@ class HeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context,
                 source = DataSource.GOOGLE,
                 height = TrackedMetric(
                     count = totalHeight.toInt(),
-                    sources = listOf("GoogleFit")
                 ),
                 metadata = ActivityMetadata(
                     devices = listOf("Unknown"),

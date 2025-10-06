@@ -34,7 +34,7 @@ class HydrationFetcher(context: Context, userId: UUID) : HealthDataFetcher(conte
                     timestamp = record.endTime,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device.toString()),
+                        devices = getDeviceModels(hydrationRecords),
                         confidence = DataConfidence.HIGH
                     ),
                     hydration = Hydration(

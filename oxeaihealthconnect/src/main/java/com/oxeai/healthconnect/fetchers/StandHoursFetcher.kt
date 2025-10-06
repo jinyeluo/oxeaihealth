@@ -45,7 +45,7 @@ class StandHoursFetcher(context: Context, userId: UUID) : HealthDataFetcher(cont
                     source = "GoogleFit"
                 ),
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(standHoursRecords),
                     confidence = DataConfidence.LOW // Confidence is low due to proxy metric
                 )
             )

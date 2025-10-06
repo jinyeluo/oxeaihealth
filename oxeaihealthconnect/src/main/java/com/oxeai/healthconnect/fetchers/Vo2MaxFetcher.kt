@@ -35,7 +35,7 @@ class Vo2MaxFetcher(context: Context, userId: UUID) : HealthDataFetcher(context,
                 source = DataSource.GOOGLE,
                 vo2Max = avgVo2Max,
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(vo2MaxRecords),
                     confidence = DataConfidence.HIGH
                 )
             )

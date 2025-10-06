@@ -37,10 +37,9 @@ class PowerFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
                 power = TrackedMeasurement(
                     value = totalPower,
                     unit = "watts",
-                    sources = listOf("GoogleFit")
                 ),
                 metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
+                    devices = getDeviceModels(powerRecords),
                     confidence = DataConfidence.HIGH
                 )
             )

@@ -35,7 +35,7 @@ class MenstruationFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
                     source = DataSource.GOOGLE,
                     flow = record.flow.toString(),
                     metadata = ActivityMetadata(
-                        devices = listOf(record.metadata.device?.manufacturer ?: "Unknown"),
+                        devices = getDeviceModels(menstruationRecords),
                         confidence = DataConfidence.HIGH
                     )
                 )
