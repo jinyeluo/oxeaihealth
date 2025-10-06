@@ -26,8 +26,8 @@ class BodyTemperatureFetcher(context: Context, userId: UUID) : HealthDataFetcher
                 recordType = BodyTemperatureRecord::class,
                 timeRangeFilter = between(startTime, endTime)
             )
-            val bodyTemperatureRecords = healthConnectClient.readRecords(bodyTemperatureRequest)
-            if (bodyTemperatureRecords.records.isEmpty()) {
+            val readRecordsResponse = healthConnectClient.readRecords(bodyTemperatureRequest)
+            if (readRecordsResponse.records.isEmpty()) {
                 return
             }
 
@@ -36,13 +36,13 @@ class BodyTemperatureFetcher(context: Context, userId: UUID) : HealthDataFetcher
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
                 metadata = ActivityMetadata(
-                    devices = getDeviceModels(bodyTemperatureRecords),
+                    devices = getDeviceModels(readRecordsResponse),
                     confidence = DataConfidence.HIGH
                 ),
                 bodyTemperature = ArrayList()
             )
-            bodyTemperatureRecords.records.forEach { record ->
-                bodyTemperatureData.bodyTemperature.plus(
+            readRecordsResponse.records.forEach { record ->
+                bodyTemperatureData.bodyTemperature.add(
                     TemperatureReading(
                         value = record.temperature.inCelsius,
                         unit = "celsius",

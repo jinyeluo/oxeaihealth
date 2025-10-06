@@ -27,8 +27,8 @@ class DistanceFetcher(context: Context, userId: UUID) : HealthDataFetcher(contex
                 recordType = DistanceRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
             )
-            val distanceRecords = healthConnectClient.readRecords(distanceRequest)
-            val totalDistance = distanceRecords.records.sumOf { it.distance.inMeters }
+            val readRecordsResponse = healthConnectClient.readRecords(distanceRequest)
+            val totalDistance = readRecordsResponse.records.sumOf { it.distance.inMeters }
 
             val distanceData = DistanceData(
                 userId = userId,

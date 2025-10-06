@@ -26,8 +26,8 @@ class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(conte
                 recordType = HeartRateRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
             )
-            val heartRateRecords = healthConnectClient.readRecords(heartRateRequest)
-            val samples = heartRateRecords.records.flatMap { it.samples }
+            val readRecordsResponse = healthConnectClient.readRecords(heartRateRequest)
+            val samples = readRecordsResponse.records.flatMap { it.samples }
             val avgHeartRate = samples.map { it.beatsPerMinute }.average()
             val minHeartRate = samples.minOfOrNull { it.beatsPerMinute } ?: 0
             val maxHeartRate = samples.maxOfOrNull { it.beatsPerMinute } ?: 0
@@ -40,7 +40,7 @@ class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(conte
                 minBpm = minHeartRate,
                 maxBpm = maxHeartRate,
                 metadata = ActivityMetadata(
-                    devices = getDeviceModels(heartRateRecords),
+                    devices = getDeviceModels(readRecordsResponse),
                     confidence = DataConfidence.HIGH
                 )
             )

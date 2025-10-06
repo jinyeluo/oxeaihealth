@@ -26,9 +26,9 @@ class BloodPressureFetcher(context: Context, userId: UUID) : HealthDataFetcher(c
                 recordType = BloodPressureRecord::class,
                 timeRangeFilter = between(startTime, endTime)
             )
-            val bloodPressureRecords = healthConnectClient.readRecords(bloodPressureRequest)
+            val readRecordsResponse = healthConnectClient.readRecords(bloodPressureRequest)
 
-            if (bloodPressureRecords.records.isEmpty()) {
+            if (readRecordsResponse.records.isEmpty()) {
                 return
             }
 
@@ -38,12 +38,12 @@ class BloodPressureFetcher(context: Context, userId: UUID) : HealthDataFetcher(c
                 source = DataSource.GOOGLE,
                 bloodPressure = ArrayList(),
                 metadata = ActivityMetadata(
-                    devices = getDeviceModels(bloodPressureRecords),
+                    devices = getDeviceModels(readRecordsResponse),
                     confidence = DataConfidence.HIGH
                 )
             )
-            for (record in bloodPressureRecords.records) {
-                bloodPressureData.bloodPressure.plus(
+            for (record in readRecordsResponse.records) {
+                bloodPressureData.bloodPressure.add(
                     BloodPressure(
                         record.systolic.inMillimetersOfMercury.toInt(),
                         record.diastolic.inMillimetersOfMercury.toInt(),

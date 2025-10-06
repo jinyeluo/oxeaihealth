@@ -160,7 +160,7 @@ data class BasalMetabolicRateData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val basalMetabolicRate: TrackedMeasurement
+    val measurements: MutableList<TrackedMeasurement> = ArrayList()
 ) : BaseHealthData()
 
 @Serializable
@@ -171,7 +171,7 @@ data class PowerData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val power: TrackedMeasurement
+    val measurements: MutableList<TrackedMeasurement>
 ) : BaseHealthData()
 
 
@@ -190,7 +190,7 @@ data class BodyFatData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val bodyFatPercentages: List<BodyFat>
+    val bodyFatPercentages: MutableList<BodyFat>
 ) : BaseHealthData()
 
 @Serializable
@@ -254,7 +254,7 @@ data class BloodPressureData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val bloodPressure: List<BloodPressure>
+    val bloodPressure: MutableList<BloodPressure>
 ) : BaseHealthData()
 
 @Serializable
@@ -276,7 +276,7 @@ data class BodyTemperatureData(
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: ActivityMetadata,
-    val bodyTemperature: List<TemperatureReading>
+    val bodyTemperature: MutableList<TemperatureReading>
 ) : BaseHealthData()
 
 @Serializable
@@ -372,7 +372,10 @@ data class TrackedMetric(
 @Serializable
 data class TrackedMeasurement(
     val value: Double,
-    val unit: String
+    val unit: String,
+
+    @Serializable(with = InstantSerializer::class)
+    val recordedAt: Instant
 )
 
 @Serializable

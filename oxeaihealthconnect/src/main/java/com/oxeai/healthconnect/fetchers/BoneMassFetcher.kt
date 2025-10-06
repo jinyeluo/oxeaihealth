@@ -26,8 +26,8 @@ class BoneMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(contex
                 recordType = BoneMassRecord::class,
                 timeRangeFilter = between(startTime, endTime)
             )
-            val boneMassRecords = healthConnectClient.readRecords(boneMassRequest)
-            val totalBoneMass = boneMassRecords.records.sumOf { it.mass.inKilograms }
+            val readRecordsResponse = healthConnectClient.readRecords(boneMassRequest)
+            val totalBoneMass = readRecordsResponse.records.sumOf { it.mass.inKilograms }
 
             val boneMassData = BoneMassData(
                 userId = userId,
@@ -37,7 +37,7 @@ class BoneMassFetcher(context: Context, userId: UUID) : HealthDataFetcher(contex
                     count = totalBoneMass.toInt(),
                 ),
                 metadata = ActivityMetadata(
-                    devices = getDeviceModels(boneMassRecords),
+                    devices = getDeviceModels(readRecordsResponse),
                     confidence = DataConfidence.HIGH
                 )
             )

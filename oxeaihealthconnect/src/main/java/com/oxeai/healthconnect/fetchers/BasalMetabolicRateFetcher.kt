@@ -30,23 +30,28 @@ class BasalMetabolicRateFetcher(context: Context, userId: UUID) : HealthDataFetc
             val basalMetabolicRateRecords = healthConnectClient.readRecords(basalMetabolicRateRequest)
 
             if (basalMetabolicRateRecords.records.isNotEmpty()) {
+                val basalMetabolicRateData = BasalMetabolicRateData(
+                    userId = userId,
+                    timestamp = endTime,
+                    source = DataSource.GOOGLE,
+                    metadata = ActivityMetadata(
+                        devices = getDeviceModels(basalMetabolicRateRecords),
+                        confidence = DataConfidence.HIGH
+                    )
+                )
+
                 for (record in basalMetabolicRateRecords.records) {
-                    val basalMetabolicRateData = BasalMetabolicRateData(
-                        userId = userId,
-                        timestamp = endTime,
-                        source = DataSource.GOOGLE,
-                        basalMetabolicRate = TrackedMeasurement(
+                    basalMetabolicRateData.measurements.add(
+                        TrackedMeasurement(
                             value = record.basalMetabolicRate.inKilocaloriesPerDay,
                             unit = "kcal/day",
-                        ),
-                        metadata = ActivityMetadata(
-                            devices = getDeviceModels(basalMetabolicRateRecords),
-                            confidence = DataConfidence.HIGH
+                            recordedAt = record.time
                         )
                     )
-                    saveDataAsJson(basalMetabolicRateData)
-                    sendDataToApi(basalMetabolicRateData)
                 }
+
+                saveDataAsJson(basalMetabolicRateData)
+                sendDataToApi(basalMetabolicRateData)
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error reading basal metabolic rate data", e)

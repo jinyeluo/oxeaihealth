@@ -34,7 +34,7 @@ class PowerFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, 
                 userId = userId,
                 timestamp = endTime,
                 source = DataSource.GOOGLE,
-                power = TrackedMeasurement(
+                measurements = TrackedMeasurement(
                     value = totalPower,
                     unit = "watts",
                 ),

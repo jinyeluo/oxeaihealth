@@ -27,8 +27,8 @@ class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher(c
                 recordType = FloorsClimbedRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
             )
-            val floorsClimbedRecords = healthConnectClient.readRecords(floorsClimbedRequest)
-            val totalFloorsClimbed = floorsClimbedRecords.records.sumOf { it.floors.toInt() }
+            val readRecordsResponse = healthConnectClient.readRecords(floorsClimbedRequest)
+            val totalFloorsClimbed = readRecordsResponse.records.sumOf { it.floors.toInt() }
 
             val floorsClimbedData = FloorsClimbedData(
                 userId = userId,
@@ -38,7 +38,7 @@ class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher(c
                     count = totalFloorsClimbed,
                 ),
                 metadata = ActivityMetadata(
-                    devices = getDeviceModels(floorsClimbedRecords),
+                    devices = getDeviceModels(readRecordsResponse),
                     confidence = DataConfidence.HIGH
                 )
             )

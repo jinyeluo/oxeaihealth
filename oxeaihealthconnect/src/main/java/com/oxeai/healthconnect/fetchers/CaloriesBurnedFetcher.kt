@@ -40,8 +40,8 @@ class CaloriesBurnedFetcher(context: Context, userId: UUID) : HealthDataFetcher(
                 recordType = ActiveCaloriesBurnedRecord::class,
                 timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
             )
-            val activeCaloriesRecords = healthConnectClient.readRecords(activeCaloriesRequest)
-            val activeCalories = activeCaloriesRecords.records.sumOf { it.energy.inJoules }
+            val readRecordsResponse = healthConnectClient.readRecords(activeCaloriesRequest)
+            val activeCalories = readRecordsResponse.records.sumOf { it.energy.inJoules }
 
             val caloriesData = CaloriesData(
                 userId = userId,

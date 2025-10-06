@@ -33,16 +33,21 @@ class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher(co
                 recordType = BloodGlucoseRecord::class,
                 timeRangeFilter = between(startTime, endTime)
             )
-            val bloodGlucoseRecords = healthConnectClient.readRecords(bloodGlucoseRequest)
+            val readRecordsResponse = healthConnectClient.readRecords(bloodGlucoseRequest)
+
+            if (readRecordsResponse.records.isEmpty()) {
+                Log.i(TAG, "No records found.")
+                return
+            }
 
             // just use the first record. I cannot think of a reason to get them all
-            bloodGlucoseRecords.records.firstOrNull()?.let { record ->
+            readRecordsResponse.records.firstOrNull()?.let { record ->
                 val bloodGlucoseData = BloodGlucoseData(
                     userId = userId,
                     timestamp = record.time,
                     source = DataSource.GOOGLE,
                     metadata = ActivityMetadata(
-                        devices = getDeviceModels(bloodGlucoseRecords),
+                        devices = getDeviceModels(readRecordsResponse),
                         confidence = DataConfidence.HIGH
                     ),
                     bloodGlucose = BloodGlucoseReading(

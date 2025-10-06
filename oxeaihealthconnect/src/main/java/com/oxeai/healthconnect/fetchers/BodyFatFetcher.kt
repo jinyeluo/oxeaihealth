@@ -26,9 +26,9 @@ class BodyFatFetcher(context: Context, userId: UUID) : HealthDataFetcher(context
                 recordType = BodyFatRecord::class,
                 timeRangeFilter = between(startTime, endTime)
             )
-            val bodyFatRecords = healthConnectClient.readRecords(bodyFatRequest)
+            val readRecordsResponse = healthConnectClient.readRecords(bodyFatRequest)
 
-            if (bodyFatRecords.records.isEmpty()) {
+            if (readRecordsResponse.records.isEmpty()) {
                 return
             }
 
@@ -38,13 +38,15 @@ class BodyFatFetcher(context: Context, userId: UUID) : HealthDataFetcher(context
                 source = DataSource.GOOGLE,
                 bodyFatPercentages = ArrayList(),
                 metadata = ActivityMetadata(
-                    devices = getDeviceModels(bodyFatRecords),
+                    devices = getDeviceModels(readRecordsResponse),
                     confidence = DataConfidence.HIGH
                 )
             )
 
-            for (record in bodyFatRecords.records) {
-                bodyFatData.bodyFatPercentages.plus(BodyFat(record.percentage.value, record.time))
+            readRecordsResponse.records.forEach { record ->
+                if (!record.percentage.value.isZero()) {
+                    bodyFatData.bodyFatPercentages.add(BodyFat(record.percentage.value, record.time))
+                }
             }
 
             saveDataAsJson(bodyFatData)
