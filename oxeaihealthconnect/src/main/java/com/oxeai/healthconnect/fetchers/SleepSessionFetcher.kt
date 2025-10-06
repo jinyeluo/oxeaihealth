@@ -1,59 +1,59 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.SleepSessionRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.records.SleepSessionRecord.Companion.STAGE_TYPE_AWAKE
+import androidx.health.connect.client.records.SleepSessionRecord.Companion.STAGE_TYPE_DEEP
+import androidx.health.connect.client.records.SleepSessionRecord.Companion.STAGE_TYPE_LIGHT
+import androidx.health.connect.client.records.SleepSessionRecord.Companion.STAGE_TYPE_OUT_OF_BED
+import androidx.health.connect.client.records.SleepSessionRecord.Companion.STAGE_TYPE_REM
+import androidx.health.connect.client.records.SleepSessionRecord.Companion.STAGE_TYPE_SLEEPING
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
+import com.oxeai.healthconnect.models.Metadata
+import com.oxeai.healthconnect.models.SleepSession
 import com.oxeai.healthconnect.models.SleepSessionData
+import com.oxeai.healthconnect.models.SleepStage
 import java.util.UUID
 
-class SleepSessionFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
+class SleepSessionFetcher(context: Context, userId: UUID) : HealthDataFetcher<SleepSessionRecord>(context, userId, SleepSessionRecord::class) {
 
-    suspend fun getSleepSession() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(SleepSessionRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for SleepSessionRecord is not granted.")
-                return
-            }
-
-            val sleepSessionRequest = ReadRecordsRequest(
-                recordType = SleepSessionRecord::class,
-                timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<SleepSessionRecord>): SleepSessionData {
+        val sleepSessionData = SleepSessionData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val sleepSessionRecords = healthConnectClient.readRecords(sleepSessionRequest)
-
-            val sleepSessions = sleepSessionRecords.records.map { record ->
-                SleepSessionData(
-                    userId = userId,
-                    timestamp = record.startTime,
-                    source = DataSource.GOOGLE,
-                    startTime = record.startTime,
-                    endTime = record.endTime,
-                    duration = record.endTime.toEpochMilli() - record.startTime.toEpochMilli(),
-                    stages = record.stages.joinToString { it.stage.toString() },
-                    metadata = ActivityMetadata(
-                        devices = getDeviceModels(sleepSessionRecords),
-                        confidence = DataConfidence.HIGH
+        )
+        response.records.filter { record -> record.stages.isNotEmpty() }.forEach { record ->
+            record.stages.forEach { stage ->
+                sleepSessionData.measurements.add(
+                    SleepSession(
+                        startTime = stage.startTime,
+                        stage = stage.stage.toSleepStage(),
+                        endTime = stage.endTime,
                     )
                 )
             }
-
-            sleepSessions.forEach {
-                saveDataAsJson(it)
-                sendDataToApi(it)
-            }
-        } catch (e: Exception) {
-            onError(e)
         }
+        return sleepSessionData
     }
 
     companion object {
-        private const val TAG = "SleepSessionFetcher"
+        fun Int.toSleepStage(): SleepStage {
+            return when (this) {
+                STAGE_TYPE_AWAKE -> SleepStage.AWAKE
+                STAGE_TYPE_SLEEPING -> SleepStage.SLEEP
+                STAGE_TYPE_OUT_OF_BED -> SleepStage.OUT_OF_BED
+                STAGE_TYPE_LIGHT -> SleepStage.LIGHT
+                STAGE_TYPE_DEEP -> SleepStage.DEEP
+                STAGE_TYPE_REM -> SleepStage.REM
+                else -> SleepStage.UNKNOWN
+            }
+        }
     }
 }

@@ -1,56 +1,36 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.WeightRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
-import com.oxeai.healthconnect.models.TrackedMetric
+import com.oxeai.healthconnect.models.Metadata
+import com.oxeai.healthconnect.models.TrackedMeasurement
 import com.oxeai.healthconnect.models.WeightData
 import java.util.UUID
 
-class WeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
-    suspend fun getWeight() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(WeightRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for WeightRecord is not granted.")
-                return
-            }
+class WeightFetcher(context: Context, userId: UUID) : HealthDataFetcher<WeightRecord>(context, userId, WeightRecord::class) {
 
-            val weightRequest = ReadRecordsRequest(
-                recordType = WeightRecord::class,
-                timeRangeFilter = between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<WeightRecord>): WeightData {
+        val weightData = WeightData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val weightRecords = healthConnectClient.readRecords(weightRequest)
-            val totalWeight = weightRecords.records.sumOf { it.weight.inKilograms }
-
-            val weightData = WeightData(
-                userId = userId,
-                timestamp = endTime,
-                source = DataSource.GOOGLE,
-                weight = TrackedMetric(
-                    count = totalWeight.toInt(),
-                ),
-                metadata = ActivityMetadata(
-                    devices = getDeviceModels(weightRecords),
-                    confidence = DataConfidence.HIGH
+        )
+        response.records.filter { record -> record.weight.inKilograms > 0 }.forEach { record ->
+            weightData.measurements.add(
+                TrackedMeasurement(
+                    value = record.weight.inKilograms,
+                    unit = "kg",
+                    recordedAt = record.time
                 )
             )
-
-            saveDataAsJson(weightData)
-            sendDataToApi(weightData)
-
-        } catch (e: Exception) {
-            onError(e)
         }
-    }
-
-    companion object {
-        private const val TAG = "WeightFetcher"
+        return weightData
     }
 }

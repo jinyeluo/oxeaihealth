@@ -1,57 +1,35 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.OxygenSaturationRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
-import com.oxeai.healthconnect.models.OxygenSaturation
+import com.oxeai.healthconnect.models.Metadata
 import com.oxeai.healthconnect.models.OxygenSaturationData
+import com.oxeai.healthconnect.models.PercentageMeasurement
 import java.util.UUID
 
-class OxygenSaturationFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
-    suspend fun getOxygenSaturation() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(OxygenSaturationRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for OxygenSaturationRecord is not granted.")
-                return
-            }
+class OxygenSaturationFetcher(context: Context, userId: UUID) : HealthDataFetcher<OxygenSaturationRecord>(context, userId, OxygenSaturationRecord::class) {
 
-            val oxygenSaturationRequest = ReadRecordsRequest(
-                recordType = OxygenSaturationRecord::class,
-                timeRangeFilter = between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<OxygenSaturationRecord>): OxygenSaturationData {
+        val oxygenSaturationData = OxygenSaturationData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val oxygenSaturationRecords = healthConnectClient.readRecords(oxygenSaturationRequest)
-
-            oxygenSaturationRecords.records.firstOrNull()?.let { record ->
-                val oxygenSaturationData = OxygenSaturationData(
-                    userId = userId,
-                    timestamp = record.time,
-                    source = DataSource.GOOGLE,
-                    metadata = ActivityMetadata(
-                        devices = getDeviceModels(oxygenSaturationRecords),
-                        confidence = DataConfidence.HIGH
-                    ),
-                    oxygenSaturation = OxygenSaturation(
-                        percentage = record.percentage.value,
-                        recordedAt = record.time
-                    )
+        )
+        response.records.filter { record -> record.percentage.value > 0 }.forEach { record ->
+            oxygenSaturationData.measurements.add(
+                PercentageMeasurement(
+                    percentage = record.percentage.value,
+                    recordedAt = record.time
                 )
-                saveDataAsJson(oxygenSaturationData)
-                sendDataToApi(oxygenSaturationData)
-            }
-
-        } catch (e: Exception) {
-            onError(e)
+            )
         }
-    }
-
-    companion object {
-        private const val TAG = "OxygenSaturationFetcher"
+        return oxygenSaturationData
     }
 }

@@ -1,56 +1,49 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.MenstruationFlowRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
+import com.oxeai.healthconnect.models.Flow
+import com.oxeai.healthconnect.models.FlowMeasurement
 import com.oxeai.healthconnect.models.MenstruationData
+import com.oxeai.healthconnect.models.Metadata
 import java.util.UUID
 
-class MenstruationFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
+class MenstruationFetcher(context: Context, userId: UUID) :
+    HealthDataFetcher<MenstruationFlowRecord>(context, userId, MenstruationFlowRecord::class) {
 
-    suspend fun getMenstruation() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(MenstruationFlowRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for MenstruationFlowRecord is not granted.")
-                return
-            }
-
-            val menstruationRequest = ReadRecordsRequest(
-                recordType = MenstruationFlowRecord::class,
-                timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<MenstruationFlowRecord>): MenstruationData {
+        val menstruationData = MenstruationData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val menstruationRecords = healthConnectClient.readRecords(menstruationRequest)
-
-            val menstruationData = menstruationRecords.records.map { record ->
-                MenstruationData(
-                    userId = userId,
-                    timestamp = record.time,
-                    source = DataSource.GOOGLE,
-                    flow = record.flow.toString(),
-                    metadata = ActivityMetadata(
-                        devices = getDeviceModels(menstruationRecords),
-                        confidence = DataConfidence.HIGH
-                    )
+        )
+        response.records.filter { it -> it.flow > 0 }.forEach { record ->
+            menstruationData.measurements.add(
+                FlowMeasurement(
+                    flow = record.flow.toFlow(),
+                    recordedAt = record.time
                 )
-            }
-
-            menstruationData.forEach {
-                saveDataAsJson(it)
-                sendDataToApi(it)
-            }
-        } catch (e: Exception) {
-            onError(e)
+            )
         }
+        return menstruationData
     }
 
     companion object {
-        private const val TAG = "MenstruationFetcher"
+        fun Int.toFlow(): Flow {
+            return when (this) {
+                MenstruationFlowRecord.FLOW_UNKNOWN -> Flow.Unknown
+                MenstruationFlowRecord.FLOW_LIGHT -> Flow.Light
+                MenstruationFlowRecord.FLOW_MEDIUM -> Flow.Medium
+                MenstruationFlowRecord.FLOW_HEAVY -> Flow.Heavy
+                else -> Flow.Unknown
+            }
+        }
     }
 }

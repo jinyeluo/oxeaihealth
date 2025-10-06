@@ -1,57 +1,36 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.RespiratoryRateRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
-import com.oxeai.healthconnect.models.RespiratoryRate
+import com.oxeai.healthconnect.models.Metadata
 import com.oxeai.healthconnect.models.RespiratoryRateData
+import com.oxeai.healthconnect.models.TrackedMeasurement
 import java.util.UUID
 
-class RespiratoryRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
-    suspend fun getRespiratoryRate() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(RespiratoryRateRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for RespiratoryRateRecord is not granted.")
-                return
-            }
+class RespiratoryRateFetcher(context: Context, userId: UUID) : HealthDataFetcher<RespiratoryRateRecord>(context, userId, RespiratoryRateRecord::class) {
 
-            val respiratoryRateRequest = ReadRecordsRequest(
-                recordType = RespiratoryRateRecord::class,
-                timeRangeFilter = between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<RespiratoryRateRecord>): RespiratoryRateData {
+        val respiratoryRateData = RespiratoryRateData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val respiratoryRateRecords = healthConnectClient.readRecords(respiratoryRateRequest)
-
-            respiratoryRateRecords.records.firstOrNull()?.let { record ->
-                val respiratoryRateData = RespiratoryRateData(
-                    userId = userId,
-                    timestamp = record.time,
-                    source = DataSource.GOOGLE,
-                    metadata = ActivityMetadata(
-                        devices = getDeviceModels(respiratoryRateRecords),
-                        confidence = DataConfidence.HIGH
-                    ),
-                    respiratoryRate = RespiratoryRate(
-                        value = record.rate.toInt(),
-                        recordedAt = record.time
-                    )
+        )
+        response.records.filter { record -> record.rate > 0 }.forEach { record ->
+            respiratoryRateData.measurements.add(
+                TrackedMeasurement(
+                    value = record.rate,
+                    unit = "breaths per minute",
+                    recordedAt = record.time
                 )
-                saveDataAsJson(respiratoryRateData)
-                sendDataToApi(respiratoryRateData)
-            }
-
-        } catch (e: Exception) {
-            onError(e)
+            )
         }
-    }
-
-    companion object {
-        private const val TAG = "RespiratoryRateFetcher"
+        return respiratoryRateData
     }
 }

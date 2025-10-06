@@ -4,9 +4,17 @@ import android.content.Context
 import android.os.Environment
 import android.util.Log
 import androidx.health.connect.client.HealthConnectClient
+import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.Record
+import androidx.health.connect.client.request.ReadRecordsRequest
 import androidx.health.connect.client.response.ReadRecordsResponse
+import androidx.health.connect.client.time.TimeRangeFilter
 import com.oxeai.healthconnect.models.BaseHealthData
+import com.oxeai.healthconnect.models.MealType.BREAKFAST
+import com.oxeai.healthconnect.models.MealType.DINNER
+import com.oxeai.healthconnect.models.MealType.LUNCH
+import com.oxeai.healthconnect.models.MealType.SNACK
+import com.oxeai.healthconnect.models.MealType.UNKNOWN
 import kotlinx.serialization.json.Json
 import java.io.File
 import java.io.FileWriter
@@ -15,12 +23,44 @@ import java.time.Instant
 import java.time.temporal.ChronoUnit
 
 import java.util.UUID
+import kotlin.reflect.KClass
 
-open class HealthDataFetcher(context: Context, protected val userId: UUID) {
+abstract class HealthDataFetcher<T : Record>(
+    protected val context: Context,
+    protected val userId: UUID,
+    private val recordType: KClass<T>
+) {
     protected val healthConnectClient = HealthConnectClient.getOrCreate(context)
     protected val endTime = Instant.now()
     protected val startTime = endTime.minus(1, ChronoUnit.HOURS)
 
+    abstract fun processRecords(response: ReadRecordsResponse<T>): BaseHealthData
+
+    suspend fun fetchData() {
+        try {
+            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
+            if (HealthPermission.getReadPermission(recordType) !in permissions) {
+                Log.w(TAG, "Read permission for ${recordType.simpleName} is not granted.")
+                return
+            }
+
+            val request = ReadRecordsRequest(
+                recordType = recordType,
+                timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+            )
+            val response = healthConnectClient.readRecords(request)
+
+            if (response.records.isNotEmpty()) {
+                val data = processRecords(response)
+                if (data.isValid()) {
+                    saveDataAsJson(data)
+                    sendDataToApi(data)
+                }
+            }
+        } catch (e: Exception) {
+            onError(e)
+        }
+    }
 
     protected fun saveDataAsJson(data: BaseHealthData) {
         try {
@@ -55,6 +95,18 @@ open class HealthDataFetcher(context: Context, protected val userId: UUID) {
                 .mapNotNull { it.metadata.device?.model }
                 .distinct()
         }
+
+        fun Int.toMealType(): com.oxeai.healthconnect.models.MealType {
+            return when (this) {
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_BREAKFAST -> BREAKFAST
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_LUNCH -> LUNCH
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_DINNER -> DINNER
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_SNACK -> SNACK
+                androidx.health.connect.client.records.MealType.MEAL_TYPE_UNKNOWN -> UNKNOWN
+                else -> UNKNOWN
+            }
+        }
+
     }
 }
 

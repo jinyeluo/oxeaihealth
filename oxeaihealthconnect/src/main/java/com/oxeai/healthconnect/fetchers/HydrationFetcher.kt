@@ -1,57 +1,37 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HydrationRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
-import com.oxeai.healthconnect.models.Hydration
 import com.oxeai.healthconnect.models.HydrationData
+import com.oxeai.healthconnect.models.IntervalMeasurement
+import com.oxeai.healthconnect.models.Metadata
 import java.util.UUID
 
-class HydrationFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
-    suspend fun getHydration() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(HydrationRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for HydrationRecord is not granted.")
-                return
-            }
+class HydrationFetcher(context: Context, userId: UUID) : HealthDataFetcher<HydrationRecord>(context, userId, HydrationRecord::class) {
 
-            val hydrationRequest = ReadRecordsRequest(
-                recordType = HydrationRecord::class,
-                timeRangeFilter = between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<HydrationRecord>): HydrationData {
+        val hydrationData = HydrationData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val hydrationRecords = healthConnectClient.readRecords(hydrationRequest)
-
-            hydrationRecords.records.firstOrNull()?.let { record ->
-                val hydrationData = HydrationData(
-                    userId = userId,
-                    timestamp = record.endTime,
-                    source = DataSource.GOOGLE,
-                    metadata = ActivityMetadata(
-                        devices = getDeviceModels(hydrationRecords),
-                        confidence = DataConfidence.HIGH
-                    ),
-                    hydration = Hydration(
-                        water = record.volume.inLiters,
-                        unit = "liters"
-                    )
+        )
+        response.records.filter { record -> record.volume.inLiters > 0 }.forEach { record ->
+            hydrationData.measurements.add(
+                IntervalMeasurement(
+                    value = record.volume.inLiters,
+                    unit = "l",
+                    startTime = record.startTime,
+                    endTime = record.endTime
                 )
-                saveDataAsJson(hydrationData)
-                sendDataToApi(hydrationData)
-            }
-
-        } catch (e: Exception) {
-            onError(e)
+            )
         }
-    }
-
-    companion object {
-        private const val TAG = "HydrationFetcher"
+        return hydrationData
     }
 }

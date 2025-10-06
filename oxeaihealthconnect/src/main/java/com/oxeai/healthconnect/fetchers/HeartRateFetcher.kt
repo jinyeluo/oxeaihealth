@@ -1,58 +1,37 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeartRateRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.HeartRateData
+import com.oxeai.healthconnect.models.HeartRateSample
+import com.oxeai.healthconnect.models.Metadata
 import java.util.UUID
 
-class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
+class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher<HeartRateRecord>(context, userId, HeartRateRecord::class) {
 
-    suspend fun getHeartRate() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(HeartRateRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for HeartRateRecord is not granted.")
-                return
-            }
-
-            val heartRateRequest = ReadRecordsRequest(
-                recordType = HeartRateRecord::class,
-                timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<HeartRateRecord>): HeartRateData {
+        val heartRateData = HeartRateData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val readRecordsResponse = healthConnectClient.readRecords(heartRateRequest)
-            val samples = readRecordsResponse.records.flatMap { it.samples }
-            val avgHeartRate = samples.map { it.beatsPerMinute }.average()
-            val minHeartRate = samples.minOfOrNull { it.beatsPerMinute } ?: 0
-            val maxHeartRate = samples.maxOfOrNull { it.beatsPerMinute } ?: 0
-
-            val heartRateData = HeartRateData(
-                userId = userId,
-                timestamp = endTime,
-                source = DataSource.GOOGLE,
-                averageBpm = avgHeartRate,
-                minBpm = minHeartRate,
-                maxBpm = maxHeartRate,
-                metadata = ActivityMetadata(
-                    devices = getDeviceModels(readRecordsResponse),
-                    confidence = DataConfidence.HIGH
+        )
+        response.records.filter { record -> record.samples.isNotEmpty() }.forEach { record ->
+            record.samples.filter { sample -> sample.beatsPerMinute > 0 }.forEach { sample ->
+                heartRateData.measurements.add(
+                    HeartRateSample(
+                        beatsPerMinute = sample.beatsPerMinute.toInt(),
+                        time = sample.time
+                    )
                 )
-            )
-
-            saveDataAsJson(heartRateData)
-            sendDataToApi(heartRateData)
-        } catch (e: Exception) {
-            onError(e)
+            }
         }
-    }
-
-    companion object {
-        private const val TAG = "HeartRateFetcher"
+        return heartRateData
     }
 }

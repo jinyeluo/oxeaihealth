@@ -1,56 +1,37 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.FloorsClimbedRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.FloorsClimbedData
-import com.oxeai.healthconnect.models.TrackedMetric
+import com.oxeai.healthconnect.models.IntervalMeasurement
+import com.oxeai.healthconnect.models.Metadata
 import java.util.UUID
 
-class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
+class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher<FloorsClimbedRecord>(context, userId, FloorsClimbedRecord::class) {
 
-    suspend fun getFloorsClimbed() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(FloorsClimbedRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for FloorsClimbedRecord is not granted.")
-                return
-            }
-
-            val floorsClimbedRequest = ReadRecordsRequest(
-                recordType = FloorsClimbedRecord::class,
-                timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<FloorsClimbedRecord>): FloorsClimbedData {
+        val floorsClimbedData = FloorsClimbedData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val readRecordsResponse = healthConnectClient.readRecords(floorsClimbedRequest)
-            val totalFloorsClimbed = readRecordsResponse.records.sumOf { it.floors.toInt() }
-
-            val floorsClimbedData = FloorsClimbedData(
-                userId = userId,
-                timestamp = endTime,
-                source = DataSource.GOOGLE,
-                floorsClimbed = TrackedMetric(
-                    count = totalFloorsClimbed,
-                ),
-                metadata = ActivityMetadata(
-                    devices = getDeviceModels(readRecordsResponse),
-                    confidence = DataConfidence.HIGH
+        )
+        response.records.filter { record -> record.floors > 0 }.forEach { record ->
+            floorsClimbedData.measurements.add(
+                IntervalMeasurement(
+                    value = record.floors,
+                    unit = "floor",
+                    startTime = record.startTime,
+                    endTime = record.endTime
                 )
             )
-
-            saveDataAsJson(floorsClimbedData)
-            sendDataToApi(floorsClimbedData)
-        } catch (e: Exception) {
-            onError(e)
         }
-    }
-
-    companion object {
-        private const val TAG = "FloorsClimbedFetcher"
+        return floorsClimbedData
     }
 }

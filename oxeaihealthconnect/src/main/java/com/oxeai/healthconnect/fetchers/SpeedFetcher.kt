@@ -1,53 +1,38 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.SpeedRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
+import com.oxeai.healthconnect.models.Metadata
 import com.oxeai.healthconnect.models.SpeedData
+import com.oxeai.healthconnect.models.TrackedMeasurement
 import java.util.UUID
 
-class SpeedFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
+class SpeedFetcher(context: Context, userId: UUID) : HealthDataFetcher<SpeedRecord>(context, userId, SpeedRecord::class) {
 
-    suspend fun getSpeed() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(SpeedRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for SpeedRecord is not granted.")
-                return
-            }
-
-            val speedRequest = ReadRecordsRequest(
-                recordType = SpeedRecord::class,
-                timeRangeFilter = TimeRangeFilter.between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<SpeedRecord>): SpeedData {
+        val speedData = SpeedData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val speedRecords = healthConnectClient.readRecords(speedRequest)
-            val avgSpeed = speedRecords.records.flatMap { it.samples }.map { it.speed.inMetersPerSecond }.average()
-
-            val speedData = SpeedData(
-                userId = userId,
-                timestamp = endTime,
-                source = DataSource.GOOGLE,
-                averageSpeed = avgSpeed,
-                metadata = ActivityMetadata(
-                    devices = getDeviceModels(speedRecords),
-                    confidence = DataConfidence.HIGH
+        )
+        response.records.filter { record -> record.samples.isNotEmpty() }.forEach { record ->
+            record.samples.forEach { sample ->
+                speedData.measurements.add(
+                    TrackedMeasurement(
+                        recordedAt = sample.time,
+                        value = sample.speed.inMetersPerSecond,
+                        unit = "m/s",
+                    )
                 )
-            )
-
-            saveDataAsJson(speedData)
-            sendDataToApi(speedData)
-        } catch (e: Exception) {
-            onError(e)
+            }
         }
-    }
-
-    companion object {
-        private const val TAG = "SpeedFetcher"
+        return speedData
     }
 }

@@ -1,56 +1,37 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.HeightRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter.Companion.between
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.HeightData
-import com.oxeai.healthconnect.models.TrackedMetric
+import com.oxeai.healthconnect.models.Metadata
+import com.oxeai.healthconnect.models.TrackedMeasurement
 import java.util.UUID
 
-class HeightFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
-    suspend fun getHeight() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(HeightRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for HeightRecord is not granted.")
-                return
-            }
+class HeightFetcher(context: Context, userId: UUID) : HealthDataFetcher<HeightRecord>(context, userId, HeightRecord::class) {
 
-            val heightRequest = ReadRecordsRequest(
-                recordType = HeightRecord::class,
-                timeRangeFilter = between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<HeightRecord>): HeightData {
+        val heightData = HeightData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val heightRecords = healthConnectClient.readRecords(heightRequest)
-            val totalHeight = heightRecords.records.sumOf { it.height.inMeters }
-
-            val heightData = HeightData(
-                userId = userId,
-                timestamp = endTime,
-                source = DataSource.GOOGLE,
-                height = TrackedMetric(
-                    count = totalHeight.toInt(),
-                ),
-                metadata = ActivityMetadata(
-                    devices = listOf("Unknown"),
-                    confidence = DataConfidence.HIGH
+        )
+        response.records.filter { record -> record.height.inMeters > 0 }.forEach { record ->
+            heightData.measurements.add(
+                TrackedMeasurement(
+                    value = record.height.inMeters,
+                    unit = "m",
+                    recordedAt = record.time
                 )
             )
-
-            saveDataAsJson(heightData)
-            sendDataToApi(heightData)
-
-        } catch (e: Exception) {
-            onError(e)
         }
-    }
-
-    companion object {
-        private const val TAG = "HeightFetcher"
+        return heightData
     }
 }
+

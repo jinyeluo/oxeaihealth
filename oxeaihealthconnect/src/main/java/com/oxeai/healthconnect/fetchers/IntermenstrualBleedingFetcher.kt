@@ -1,55 +1,35 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
-import android.util.Log
-import androidx.health.connect.client.permission.HealthPermission
 import androidx.health.connect.client.records.IntermenstrualBleedingRecord
-import androidx.health.connect.client.request.ReadRecordsRequest
-import androidx.health.connect.client.time.TimeRangeFilter
-import com.oxeai.healthconnect.models.ActivityMetadata
+import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
 import com.oxeai.healthconnect.models.DataSource
 import com.oxeai.healthconnect.models.IntermenstrualBleedingData
+import com.oxeai.healthconnect.models.Metadata
+import com.oxeai.healthconnect.models.TimeMeasurement
 import java.util.UUID
 
-class IntermenstrualBleedingFetcher(context: Context, userId: UUID) : HealthDataFetcher(context, userId) {
+class IntermenstrualBleedingFetcher(context: Context, userId: UUID) :
+    HealthDataFetcher<IntermenstrualBleedingRecord>(context, userId, IntermenstrualBleedingRecord::class) {
 
-    suspend fun getIntermenstrualBleeding() {
-        try {
-            val permissions = healthConnectClient.permissionController.getGrantedPermissions()
-            if (HealthPermission.getReadPermission(IntermenstrualBleedingRecord::class) !in permissions) {
-                Log.w(TAG, "Read permission for IntermenstrualBleedingRecord is not granted.")
-                return
-            }
-
-            val intermenstrualBleedingRequest = ReadRecordsRequest(
-                recordType = IntermenstrualBleedingRecord::class,
-                timeRangeFilter = TimeRangeFilter.Companion.between(startTime, endTime)
+    override fun processRecords(response: ReadRecordsResponse<IntermenstrualBleedingRecord>): IntermenstrualBleedingData {
+        val intermenstrualBleedingData = IntermenstrualBleedingData(
+            userId = userId,
+            timestamp = endTime,
+            source = DataSource.GOOGLE,
+            metadata = Metadata(
+                devices = getDeviceModels(response),
+                confidence = DataConfidence.HIGH
             )
-            val intermenstrualBleedingRecords = healthConnectClient.readRecords(intermenstrualBleedingRequest)
-
-            val intermenstrualBleedingData = intermenstrualBleedingRecords.records.map { record ->
-                IntermenstrualBleedingData(
-                    userId = userId,
-                    timestamp = record.time,
-                    source = DataSource.GOOGLE,
-                    metadata = ActivityMetadata(
-                        devices = getDeviceModels(intermenstrualBleedingRecords),
-                        confidence = DataConfidence.HIGH
-                    )
+        )
+        response.records.forEach { record ->
+            intermenstrualBleedingData.measurements.add(
+                TimeMeasurement(
+                    time = record.time
                 )
-            }
-
-            intermenstrualBleedingData.forEach {
-                saveDataAsJson(it)
-                sendDataToApi(it)
-            }
-        } catch (e: Exception) {
-            onError(e)
+            )
         }
-    }
-
-    companion object {
-        private const val TAG = "IntermenstrualBleedingFetcher"
+        return intermenstrualBleedingData
     }
 }
