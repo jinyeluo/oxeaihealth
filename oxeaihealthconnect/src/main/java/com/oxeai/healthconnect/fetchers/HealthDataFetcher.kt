@@ -91,7 +91,7 @@ abstract class HealthDataFetcher<T : Record>(
     companion object {
         private const val TAG = "HealthDataFetcher"
         fun <T : Record> getDeviceModels(response: ReadRecordsResponse<T>): List<String> {
-            return response.records
+            return response.records.filter { it.metadata.device != null && !(it.metadata.device!!.model.equals("Unknown")) }
                 .mapNotNull { it.metadata.device?.model }
                 .distinct()
         }
