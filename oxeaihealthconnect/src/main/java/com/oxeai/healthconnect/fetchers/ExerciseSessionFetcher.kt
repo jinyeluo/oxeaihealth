@@ -1,6 +1,7 @@
 package com.oxeai.healthconnect.fetchers
 
 import android.content.Context
+import androidx.health.connect.client.records.ExerciseSegment
 import androidx.health.connect.client.records.ExerciseSessionRecord
 import androidx.health.connect.client.response.ReadRecordsResponse
 import com.oxeai.healthconnect.models.DataConfidence
@@ -24,15 +25,35 @@ class ExerciseSessionFetcher(context: Context, userId: UUID) :
                 confidence = DataConfidence.HIGH
             )
         )
+
         response.records.forEach { record ->
             exerciseData.measurements.add(
                 Exercise(
                     // a lot of exercise's details are skipped here
-                    exerciseType = record.exerciseType.fromInt(),
+                    exerciseType = record.exerciseType.toExerciseType(),
                     startTime = record.startTime,
                     endTime = record.endTime,
                     notes = record.notes,
-                    title = record.title
+                    title = record.title,
+                    segments = record.segments.map {
+                        com.oxeai.healthconnect.models.ExerciseSegment(
+                            startTime = it.startTime,
+                            endTime = it.endTime,
+                            segmentType = it.segmentType.toSegmentType(),
+                            repetitions = it.repetitions
+                        )
+                    },
+                    laps = record.laps.map {
+                        com.oxeai.healthconnect.models.ExerciseLap(
+                            startTime = it.startTime,
+                            endTime = it.endTime,
+                            length = it.length?.inMeters?.let { length ->
+                                com.oxeai.healthconnect.models.SimpleMeasurement(
+                                    length, "m"
+                                )
+                            }
+                        )
+                    },
                 )
             )
         }
@@ -40,7 +61,80 @@ class ExerciseSessionFetcher(context: Context, userId: UUID) :
     }
 
     companion object {
-        fun Int.fromInt(): ExerciseType {
+        fun Int.toSegmentType(): com.oxeai.healthconnect.models.ExerciseSegmentType {
+            return when (this) {
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_ARM_CURL -> com.oxeai.healthconnect.models.ExerciseSegmentType.ARM_CURL
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_BACK_EXTENSION -> com.oxeai.healthconnect.models.ExerciseSegmentType.BACK_EXTENSION
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_BALL_SLAM -> com.oxeai.healthconnect.models.ExerciseSegmentType.BALL_SLAM
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_BARBELL_SHOULDER_PRESS -> com.oxeai.healthconnect.models.ExerciseSegmentType.BARBELL_SHOULDER_PRESS
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_BENCH_PRESS -> com.oxeai.healthconnect.models.ExerciseSegmentType.BENCH_PRESS
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_BENCH_SIT_UP -> com.oxeai.healthconnect.models.ExerciseSegmentType.BENCH_SIT_UP
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_BIKING -> com.oxeai.healthconnect.models.ExerciseSegmentType.BIKING
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_BIKING_STATIONARY -> com.oxeai.healthconnect.models.ExerciseSegmentType.BIKING_STATIONARY
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_BURPEE -> com.oxeai.healthconnect.models.ExerciseSegmentType.BURPEE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_CRUNCH -> com.oxeai.healthconnect.models.ExerciseSegmentType.CRUNCH
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DEADLIFT -> com.oxeai.healthconnect.models.ExerciseSegmentType.DEADLIFT
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DOUBLE_ARM_TRICEPS_EXTENSION -> com.oxeai.healthconnect.models.ExerciseSegmentType.DOUBLE_ARM_TRICEPS_EXTENSION
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DUMBBELL_CURL_LEFT_ARM -> com.oxeai.healthconnect.models.ExerciseSegmentType.DUMBBELL_CURL_LEFT_ARM
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DUMBBELL_CURL_RIGHT_ARM -> com.oxeai.healthconnect.models.ExerciseSegmentType.DUMBBELL_CURL_RIGHT_ARM
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DUMBBELL_FRONT_RAISE -> com.oxeai.healthconnect.models.ExerciseSegmentType.DUMBBELL_FRONT_RAISE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DUMBBELL_LATERAL_RAISE -> com.oxeai.healthconnect.models.ExerciseSegmentType.DUMBBELL_LATERAL_RAISE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DUMBBELL_ROW -> com.oxeai.healthconnect.models.ExerciseSegmentType.DUMBBELL_ROW
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DUMBBELL_TRICEPS_EXTENSION_LEFT_ARM -> com.oxeai.healthconnect.models.ExerciseSegmentType.DUMBBELL_TRICEPS_EXTENSION_LEFT_ARM
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DUMBBELL_TRICEPS_EXTENSION_RIGHT_ARM -> com.oxeai.healthconnect.models.ExerciseSegmentType.DUMBBELL_TRICEPS_EXTENSION_RIGHT_ARM
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_DUMBBELL_TRICEPS_EXTENSION_TWO_ARM -> com.oxeai.healthconnect.models.ExerciseSegmentType.DUMBBELL_TRICEPS_EXTENSION_TWO_ARM
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_ELLIPTICAL -> com.oxeai.healthconnect.models.ExerciseSegmentType.ELLIPTICAL
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_FORWARD_TWIST -> com.oxeai.healthconnect.models.ExerciseSegmentType.FORWARD_TWIST
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_FRONT_RAISE -> com.oxeai.healthconnect.models.ExerciseSegmentType.FRONT_RAISE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_HIGH_INTENSITY_INTERVAL_TRAINING -> com.oxeai.healthconnect.models.ExerciseSegmentType.HIGH_INTENSITY_INTERVAL_TRAINING
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_HIP_THRUST -> com.oxeai.healthconnect.models.ExerciseSegmentType.HIP_THRUST
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_HULA_HOOP -> com.oxeai.healthconnect.models.ExerciseSegmentType.HULA_HOOP
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_JUMPING_JACK -> com.oxeai.healthconnect.models.ExerciseSegmentType.JUMPING_JACK
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_JUMP_ROPE -> com.oxeai.healthconnect.models.ExerciseSegmentType.JUMP_ROPE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_KETTLEBELL_SWING -> com.oxeai.healthconnect.models.ExerciseSegmentType.KETTLEBELL_SWING
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_LATERAL_RAISE -> com.oxeai.healthconnect.models.ExerciseSegmentType.LATERAL_RAISE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_LAT_PULL_DOWN -> com.oxeai.healthconnect.models.ExerciseSegmentType.LAT_PULL_DOWN
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_LEG_CURL -> com.oxeai.healthconnect.models.ExerciseSegmentType.LEG_CURL
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_LEG_EXTENSION -> com.oxeai.healthconnect.models.ExerciseSegmentType.LEG_EXTENSION
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_LEG_PRESS -> com.oxeai.healthconnect.models.ExerciseSegmentType.LEG_PRESS
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_LEG_RAISE -> com.oxeai.healthconnect.models.ExerciseSegmentType.LEG_RAISE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_LUNGE -> com.oxeai.healthconnect.models.ExerciseSegmentType.LUNGE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_MOUNTAIN_CLIMBER -> com.oxeai.healthconnect.models.ExerciseSegmentType.MOUNTAIN_CLIMBER
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_OTHER_WORKOUT -> com.oxeai.healthconnect.models.ExerciseSegmentType.OTHER_WORKOUT
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_PAUSE -> com.oxeai.healthconnect.models.ExerciseSegmentType.PAUSE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_PILATES -> com.oxeai.healthconnect.models.ExerciseSegmentType.PILATES
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_PLANK -> com.oxeai.healthconnect.models.ExerciseSegmentType.PLANK
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_PULL_UP -> com.oxeai.healthconnect.models.ExerciseSegmentType.PULL_UP
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_PUNCH -> com.oxeai.healthconnect.models.ExerciseSegmentType.PUNCH
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_REST -> com.oxeai.healthconnect.models.ExerciseSegmentType.REST
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_ROWING_MACHINE -> com.oxeai.healthconnect.models.ExerciseSegmentType.ROWING_MACHINE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_RUNNING -> com.oxeai.healthconnect.models.ExerciseSegmentType.RUNNING
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_RUNNING_TREADMILL -> com.oxeai.healthconnect.models.ExerciseSegmentType.RUNNING_TREADMILL
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SHOULDER_PRESS -> com.oxeai.healthconnect.models.ExerciseSegmentType.SHOULDER_PRESS
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SINGLE_ARM_TRICEPS_EXTENSION -> com.oxeai.healthconnect.models.ExerciseSegmentType.SINGLE_ARM_TRICEPS_EXTENSION
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SIT_UP -> com.oxeai.healthconnect.models.ExerciseSegmentType.SIT_UP
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SQUAT -> com.oxeai.healthconnect.models.ExerciseSegmentType.SQUAT
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_STAIR_CLIMBING -> com.oxeai.healthconnect.models.ExerciseSegmentType.STAIR_CLIMBING
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_STAIR_CLIMBING_MACHINE -> com.oxeai.healthconnect.models.ExerciseSegmentType.STAIR_CLIMBING_MACHINE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_STRETCHING -> com.oxeai.healthconnect.models.ExerciseSegmentType.STRETCHING
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SWIMMING_BACKSTROKE -> com.oxeai.healthconnect.models.ExerciseSegmentType.SWIMMING_BACKSTROKE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SWIMMING_BREASTSTROKE -> com.oxeai.healthconnect.models.ExerciseSegmentType.SWIMMING_BREASTSTROKE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SWIMMING_BUTTERFLY -> com.oxeai.healthconnect.models.ExerciseSegmentType.SWIMMING_BUTTERFLY
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SWIMMING_FREESTYLE -> com.oxeai.healthconnect.models.ExerciseSegmentType.SWIMMING_FREESTYLE
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SWIMMING_MIXED -> com.oxeai.healthconnect.models.ExerciseSegmentType.SWIMMING_MIXED
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SWIMMING_OPEN_WATER -> com.oxeai.healthconnect.models.ExerciseSegmentType.SWIMMING_OPEN_WATER
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SWIMMING_OTHER -> com.oxeai.healthconnect.models.ExerciseSegmentType.SWIMMING_OTHER
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_SWIMMING_POOL -> com.oxeai.healthconnect.models.ExerciseSegmentType.SWIMMING_POOL
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_UPPER_TWIST -> com.oxeai.healthconnect.models.ExerciseSegmentType.UPPER_TWIST
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_WALKING -> com.oxeai.healthconnect.models.ExerciseSegmentType.WALKING
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_WEIGHTLIFTING -> com.oxeai.healthconnect.models.ExerciseSegmentType.WEIGHTLIFTING
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_WHEELCHAIR -> com.oxeai.healthconnect.models.ExerciseSegmentType.WHEELCHAIR
+                ExerciseSegment.EXERCISE_SEGMENT_TYPE_YOGA -> com.oxeai.healthconnect.models.ExerciseSegmentType.YOGA
+                else -> com.oxeai.healthconnect.models.ExerciseSegmentType.UNKNOWN
+            }
+        }
+
+        fun Int.toExerciseType(): ExerciseType {
             return when (this) {
                 ExerciseSessionRecord.EXERCISE_TYPE_BADMINTON -> ExerciseType.BADMINTON
                 ExerciseSessionRecord.EXERCISE_TYPE_BASEBALL -> ExerciseType.BASEBALL

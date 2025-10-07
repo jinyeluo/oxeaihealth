@@ -431,7 +431,117 @@ data class Exercise(
     @Serializable(with = InstantSerializer::class)
     val startTime: Instant,
     @Serializable(with = InstantSerializer::class)
-    val endTime: Instant
+    val endTime: Instant,
+    val segments: List<ExerciseSegment> = emptyList(),
+    val laps: List<ExerciseLap> = emptyList(),
+    val route: ExerciseRoute? = null
+)
+
+@Serializable
+data class ExerciseSegment(
+    @Serializable(with = InstantSerializer::class)
+    val startTime: Instant,
+    @Serializable(with = InstantSerializer::class)
+    val endTime: Instant,
+    val segmentType: ExerciseSegmentType,
+    val repetitions: Int
+)
+
+enum class ExerciseSegmentType {
+    UNKNOWN,
+    ARM_CURL,
+    BACK_EXTENSION,
+    BALL_SLAM,
+    BARBELL_SHOULDER_PRESS,
+    BENCH_PRESS,
+    BENCH_SIT_UP,
+    BIKING,
+    BIKING_STATIONARY,
+    BURPEE,
+    CRUNCH,
+    DEADLIFT,
+    DOUBLE_ARM_TRICEPS_EXTENSION,
+    DUMBBELL_CURL_LEFT_ARM,
+    DUMBBELL_CURL_RIGHT_ARM,
+    DUMBBELL_FRONT_RAISE,
+    DUMBBELL_LATERAL_RAISE,
+    DUMBBELL_ROW,
+    DUMBBELL_TRICEPS_EXTENSION_LEFT_ARM,
+    DUMBBELL_TRICEPS_EXTENSION_RIGHT_ARM,
+    DUMBBELL_TRICEPS_EXTENSION_TWO_ARM,
+    ELLIPTICAL,
+    FORWARD_TWIST,
+    FRONT_RAISE,
+    HIGH_INTENSITY_INTERVAL_TRAINING,
+    HIP_THRUST,
+    HULA_HOOP,
+    JUMPING_JACK,
+    JUMP_ROPE,
+    KETTLEBELL_SWING,
+    LATERAL_RAISE,
+    LAT_PULL_DOWN,
+    LEG_CURL,
+    LEG_EXTENSION,
+    LEG_PRESS,
+    LEG_RAISE,
+    LUNGE,
+    MOUNTAIN_CLIMBER,
+    OTHER_WORKOUT,
+    PAUSE,
+    PILATES,
+    PLANK,
+    PULL_UP,
+    PUNCH,
+    REST,
+    ROWING_MACHINE,
+    RUNNING,
+    RUNNING_TREADMILL,
+    SHOULDER_PRESS,
+    SINGLE_ARM_TRICEPS_EXTENSION,
+    SIT_UP,
+    SQUAT,
+    STAIR_CLIMBING,
+    STAIR_CLIMBING_MACHINE,
+    STRETCHING,
+    SWIMMING_BACKSTROKE,
+    SWIMMING_BREASTSTROKE,
+    SWIMMING_BUTTERFLY,
+    SWIMMING_FREESTYLE,
+    SWIMMING_MIXED,
+    SWIMMING_OPEN_WATER,
+    SWIMMING_OTHER,
+    SWIMMING_POOL,
+    UPPER_TWIST,
+    WALKING,
+    WEIGHTLIFTING,
+    WHEELCHAIR,
+    YOGA
+}
+
+@Serializable
+data class ExerciseLap(
+    @Serializable(with = InstantSerializer::class)
+    val startTime: Instant,
+    @Serializable(with = InstantSerializer::class)
+    val endTime: Instant,
+    val length: SimpleMeasurement? = null
+)
+
+@Serializable
+data class ExerciseRoute(
+    val route: List<ExerciseRouteLocation>
+)
+
+@Serializable
+data class ExerciseRouteLocation(
+    @Serializable(with = InstantSerializer::class)
+    val time: Instant,
+    val latitude: Double,
+    val longitude: Double,
+    val horizontalAccuracy: SimpleMeasurement? = null,
+    val verticalAccuracy: SimpleMeasurement? = null,
+    val altitude: SimpleMeasurement? = null,
+    val speed: SimpleMeasurement? = null
 )
 
 class ExerciseData(
