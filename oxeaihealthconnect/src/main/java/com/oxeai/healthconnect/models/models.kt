@@ -18,6 +18,12 @@ data class TrackedMetric(
 )
 
 @Serializable
+data class SimpleMeasurement(
+    val value: Double,
+    val unit: String,
+)
+
+@Serializable
 data class TrackedMeasurement(
     val value: Double,
     val unit: String,
@@ -442,92 +448,92 @@ class Nutrition(
     val startTime: Instant,
     @Serializable(with = InstantSerializer::class)
     val endTime: Instant,
-    /** Biotin in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val biotin: TrackedMeasurement? = null,
-    /** Caffeine in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val caffeine: TrackedMeasurement? = null,
-    /** Calcium in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val calcium: TrackedMeasurement? = null,
-    /** Energy in [Energy] unit. Optional field. Valid range: 0-100000 kcal. */
-    public val energy: TrackedMeasurement? = null,
-    /** Energy from fat in [Energy] unit. Optional field. Valid range: 0-100000 kcal. */
-    public val energyFromFat: TrackedMeasurement? = null,
-    /** Chloride in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val chloride: TrackedMeasurement? = null,
-    /** Cholesterol in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val cholesterol: TrackedMeasurement? = null,
-    /** Chromium in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val chromium: TrackedMeasurement? = null,
-    /** Copper in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val copper: TrackedMeasurement? = null,
-    /** Dietary fiber in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val dietaryFiber: TrackedMeasurement? = null,
-    /** Folate in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val folate: TrackedMeasurement? = null,
-    /** Folic acid in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val folicAcid: TrackedMeasurement? = null,
-    /** Iodine in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val iodine: TrackedMeasurement? = null,
-    /** Iron in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val iron: TrackedMeasurement? = null,
-    /** Magnesium in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val magnesium: TrackedMeasurement? = null,
-    /** Manganese in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val manganese: TrackedMeasurement? = null,
-    /** Molybdenum in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val molybdenum: TrackedMeasurement? = null,
-    /** Monounsaturated fat in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val monounsaturatedFat: TrackedMeasurement? = null,
-    /** Niacin in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val niacin: TrackedMeasurement? = null,
-    /** Pantothenic acid in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val pantothenicAcid: TrackedMeasurement? = null,
-    /** Phosphorus in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val phosphorus: TrackedMeasurement? = null,
-    /** Polyunsaturated fat in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val polyunsaturatedFat: TrackedMeasurement? = null,
-    /** Potassium in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val potassium: TrackedMeasurement? = null,
-    /** Protein in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val protein: TrackedMeasurement? = null,
-    /** Riboflavin in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val riboflavin: TrackedMeasurement? = null,
-    /** Saturated fat in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val saturatedFat: TrackedMeasurement? = null,
-    /** Selenium in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val selenium: TrackedMeasurement? = null,
-    /** Sodium in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val sodium: TrackedMeasurement? = null,
-    /** Sugar in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val sugar: TrackedMeasurement? = null,
-    /** Thiamin in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val thiamin: TrackedMeasurement? = null,
-    /** Total carbohydrate in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val totalCarbohydrate: TrackedMeasurement? = null,
-    /** Total fat in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val totalFat: TrackedMeasurement? = null,
-    /** Trans fat in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val transFat: TrackedMeasurement? = null,
-    /** Unsaturated fat in [TrackedMeasurement] unit. Optional field. Valid range: 0-100000 grams. */
-    public val unsaturatedFat: TrackedMeasurement? = null,
-    /** Vitamin A in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val vitaminA: TrackedMeasurement? = null,
-    /** Vitamin B12 in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val vitaminB12: TrackedMeasurement? = null,
-    /** Vitamin B6 in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val vitaminB6: TrackedMeasurement? = null,
-    /** Vitamin C in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val vitaminC: TrackedMeasurement? = null,
-    /** Vitamin D in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val vitaminD: TrackedMeasurement? = null,
-    /** Vitamin E in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val vitaminE: TrackedMeasurement? = null,
-    /** Vitamin K in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val vitaminK: TrackedMeasurement? = null,
-    /** Zinc in [TrackedMeasurement] unit. Optional field. Valid range: 0-100 grams. */
-    public val zinc: TrackedMeasurement? = null,
+    /** Biotin:. Optional field. Valid range: 0-100 grams. */
+    val biotin: SimpleMeasurement? = null,
+    /** Caffeine:. Optional field. Valid range: 0-100 grams. */
+    val caffeine: SimpleMeasurement? = null,
+    /** Calcium:. Optional field. Valid range: 0-100 grams. */
+    val calcium: SimpleMeasurement? = null,
+    /** Energy. Optional field. Valid range: 0-100000 kcal. */
+    val energy: SimpleMeasurement? = null,
+    /** Energy. Optional field. Valid range: 0-100000 kcal. */
+    val energyFromFat: SimpleMeasurement? = null,
+    /** Chloride:. Optional field. Valid range: 0-100 grams. */
+    val chloride: SimpleMeasurement? = null,
+    /** Cholesterol:. Optional field. Valid range: 0-100 grams. */
+    val cholesterol: SimpleMeasurement? = null,
+    /** Chromium:. Optional field. Valid range: 0-100 grams. */
+    val chromium: SimpleMeasurement? = null,
+    /** Copper:. Optional field. Valid range: 0-100 grams. */
+    val copper: SimpleMeasurement? = null,
+    /** Dietary fiber:. Optional field. Valid range: 0-100000 grams. */
+    val dietaryFiber: SimpleMeasurement? = null,
+    /** Folate:. Optional field. Valid range: 0-100 grams. */
+    val folate: SimpleMeasurement? = null,
+    /** Folic acid:. Optional field. Valid range: 0-100 grams. */
+    val folicAcid: SimpleMeasurement? = null,
+    /** Iodine:. Optional field. Valid range: 0-100 grams. */
+    val iodine: SimpleMeasurement? = null,
+    /** Iron:. Optional field. Valid range: 0-100 grams. */
+    val iron: SimpleMeasurement? = null,
+    /** Magnesium:. Optional field. Valid range: 0-100 grams. */
+    val magnesium: SimpleMeasurement? = null,
+    /** Manganese:. Optional field. Valid range: 0-100 grams. */
+    val manganese: SimpleMeasurement? = null,
+    /** Molybdenum:. Optional field. Valid range: 0-100 grams. */
+    val molybdenum: SimpleMeasurement? = null,
+    /** Monounsaturated fat:. Optional field. Valid range: 0-100000 grams. */
+    val monounsaturatedFat: SimpleMeasurement? = null,
+    /** Niacin:. Optional field. Valid range: 0-100 grams. */
+    val niacin: SimpleMeasurement? = null,
+    /** Pantothenic acid:. Optional field. Valid range: 0-100 grams. */
+    val pantothenicAcid: SimpleMeasurement? = null,
+    /** Phosphorus:. Optional field. Valid range: 0-100 grams. */
+    val phosphorus: SimpleMeasurement? = null,
+    /** Polyunsaturated fat:. Optional field. Valid range: 0-100000 grams. */
+    val polyunsaturatedFat: SimpleMeasurement? = null,
+    /** Potassium:. Optional field. Valid range: 0-100 grams. */
+    val potassium: SimpleMeasurement? = null,
+    /** Protein:. Optional field. Valid range: 0-100000 grams. */
+    val protein: SimpleMeasurement? = null,
+    /** Riboflavin:. Optional field. Valid range: 0-100 grams. */
+    val riboflavin: SimpleMeasurement? = null,
+    /** Saturated fat:. Optional field. Valid range: 0-100000 grams. */
+    val saturatedFat: SimpleMeasurement? = null,
+    /** Selenium:. Optional field. Valid range: 0-100 grams. */
+    val selenium: SimpleMeasurement? = null,
+    /** Sodium:. Optional field. Valid range: 0-100 grams. */
+    val sodium: SimpleMeasurement? = null,
+    /** Sugar:. Optional field. Valid range: 0-100000 grams. */
+    val sugar: SimpleMeasurement? = null,
+    /** Thiamin:. Optional field. Valid range: 0-100 grams. */
+    val thiamin: SimpleMeasurement? = null,
+    /** Total carbohydrate:. Optional field. Valid range: 0-100000 grams. */
+    val totalCarbohydrate: SimpleMeasurement? = null,
+    /** Total fat:. Optional field. Valid range: 0-100000 grams. */
+    val totalFat: SimpleMeasurement? = null,
+    /** Trans fat:. Optional field. Valid range: 0-100000 grams. */
+    val transFat: SimpleMeasurement? = null,
+    /** Unsaturated fat:. Optional field. Valid range: 0-100000 grams. */
+    val unsaturatedFat: SimpleMeasurement? = null,
+    /** Vitamin A:. Optional field. Valid range: 0-100 grams. */
+    val vitaminA: SimpleMeasurement? = null,
+    /** Vitamin B12:. Optional field. Valid range: 0-100 grams. */
+    val vitaminB12: SimpleMeasurement? = null,
+    /** Vitamin B6:. Optional field. Valid range: 0-100 grams. */
+    val vitaminB6: SimpleMeasurement? = null,
+    /** Vitamin C:. Optional field. Valid range: 0-100 grams. */
+    val vitaminC: SimpleMeasurement? = null,
+    /** Vitamin D:. Optional field. Valid range: 0-100 grams. */
+    val vitaminD: SimpleMeasurement? = null,
+    /** Vitamin E:. Optional field. Valid range: 0-100 grams. */
+    val vitaminE: SimpleMeasurement? = null,
+    /** Vitamin K:. Optional field. Valid range: 0-100 grams. */
+    val vitaminK: SimpleMeasurement? = null,
+    /** Zinc:. Optional field. Valid range: 0-100 grams. */
+    val zinc: SimpleMeasurement? = null,
     /** Name for food or drink, provided by the user. Optional field. */
-    public val name: String? = null,
+    val name: String? = null,
     val mealType: MealType,
 )
 
