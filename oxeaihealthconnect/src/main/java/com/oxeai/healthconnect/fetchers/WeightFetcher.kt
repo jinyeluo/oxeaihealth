@@ -12,7 +12,7 @@ import java.util.UUID
 
 class WeightFetcher(context: Context, userId: UUID) : HealthDataFetcher<WeightRecord>(context, userId, WeightRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<WeightRecord>): WeightData {
+    override fun processRecords(response: ReadRecordsResponse<WeightRecord>): List<WeightData> {
         val weightData = WeightData(
             userId = userId,
             timestamp = endTime,
@@ -27,10 +27,11 @@ class WeightFetcher(context: Context, userId: UUID) : HealthDataFetcher<WeightRe
                 TrackedMeasurement(
                     value = record.weight.inKilograms,
                     unit = "kg",
-                    recordedAt = record.time
+                    recordedAt = record.time,
+                    timeZoneOffset = record.zoneOffset
                 )
             )
         }
-        return weightData
+        return listOf(weightData)
     }
 }

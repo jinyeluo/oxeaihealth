@@ -13,7 +13,7 @@ import java.util.UUID
 class LeanBodyMassFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<LeanBodyMassRecord>(context, userId, LeanBodyMassRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<LeanBodyMassRecord>): LeanBodyMassData {
+    override fun processRecords(response: ReadRecordsResponse<LeanBodyMassRecord>): List<LeanBodyMassData> {
         val leanBodyMassData = LeanBodyMassData(
             userId = userId,
             timestamp = endTime,
@@ -28,11 +28,12 @@ class LeanBodyMassFetcher(context: Context, userId: UUID) :
                 TrackedMeasurement(
                     value = record.mass.inGrams,
                     unit = "g",
-                    recordedAt = record.time
+                    recordedAt = record.time,
+                    timeZoneOffset = record.zoneOffset
                 )
             )
         }
-        return leanBodyMassData
+        return listOf(leanBodyMassData)
     }
 }
 

@@ -12,7 +12,7 @@ import java.util.UUID
 
 class BoneMassFetcher(context: Context, userId: UUID) : HealthDataFetcher<BoneMassRecord>(context, userId, BoneMassRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<BoneMassRecord>): BoneMassData {
+    override fun processRecords(response: ReadRecordsResponse<BoneMassRecord>): List<BoneMassData> {
         val boneMassData = BoneMassData(
             userId = userId,
             timestamp = endTime,
@@ -27,10 +27,11 @@ class BoneMassFetcher(context: Context, userId: UUID) : HealthDataFetcher<BoneMa
                 TrackedMeasurement(
                     value = record.mass.inGrams,
                     unit = "g",
-                    recordedAt = record.time
+                    recordedAt = record.time,
+                    timeZoneOffset = record.zoneOffset
                 )
             )
         }
-        return boneMassData
+        return listOf(boneMassData)
     }
 }

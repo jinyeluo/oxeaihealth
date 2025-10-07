@@ -12,27 +12,36 @@ import java.util.UUID
 
 class SpeedFetcher(context: Context, userId: UUID) : HealthDataFetcher<SpeedRecord>(context, userId, SpeedRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<SpeedRecord>): SpeedData {
-        val speedData = SpeedData(
-            userId = userId,
-            timestamp = endTime,
-            source = DataSource.GOOGLE,
-            metadata = Metadata(
-                devices = getDeviceModels(response),
-                confidence = DataConfidence.HIGH
-            )
-        )
+    override fun processRecords(response: ReadRecordsResponse<SpeedRecord>): List<SpeedData> {
+
+        var result = ArrayList<SpeedData>()
         response.records.filter { record -> record.samples.isNotEmpty() }.forEach { record ->
+
+            val speedData = SpeedData(
+                userId = userId,
+                timestamp = endTime,
+                source = DataSource.GOOGLE,
+                metadata = Metadata(
+                    devices = getDeviceModels(response),
+                    confidence = DataConfidence.HIGH
+                ),
+                startTime = record.startTime,
+                startZoneOffset = record.startZoneOffset,
+                endTime = record.endTime,
+                endZoneOffset = record.endZoneOffset
+            )
             record.samples.forEach { sample ->
                 speedData.measurements.add(
                     TrackedMeasurement(
                         recordedAt = sample.time,
                         value = sample.speed.inMetersPerSecond,
                         unit = "m/s",
+                        timeZoneOffset = null
                     )
                 )
             }
+            result.add(speedData)
         }
-        return speedData
+        return result
     }
 }

@@ -12,7 +12,7 @@ import java.util.UUID
 
 class BodyFatFetcher(context: Context, userId: UUID) : HealthDataFetcher<BodyFatRecord>(context, userId, BodyFatRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<BodyFatRecord>): BodyFatData {
+    override fun processRecords(response: ReadRecordsResponse<BodyFatRecord>): List<BodyFatData> {
         val bodyFatData = BodyFatData(
             userId = userId,
             timestamp = endTime,
@@ -28,7 +28,7 @@ class BodyFatFetcher(context: Context, userId: UUID) : HealthDataFetcher<BodyFat
                 bodyFatData.measurements.add(PercentageMeasurement(record.percentage.value, record.time))
             }
         }
-        return bodyFatData
+        return listOf(bodyFatData)
     }
 }
 

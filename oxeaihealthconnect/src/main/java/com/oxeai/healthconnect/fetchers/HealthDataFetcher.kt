@@ -34,7 +34,7 @@ abstract class HealthDataFetcher<T : Record>(
     protected val endTime = Instant.now()
     protected val startTime = endTime.minus(1, ChronoUnit.HOURS)
 
-    abstract fun processRecords(response: ReadRecordsResponse<T>): BaseHealthData
+    abstract fun processRecords(response: ReadRecordsResponse<T>): List<BaseHealthData>
 
     suspend fun fetchData() {
         try {
@@ -52,9 +52,9 @@ abstract class HealthDataFetcher<T : Record>(
 
             if (response.records.isNotEmpty()) {
                 val data = processRecords(response)
-                if (data.isValid()) {
-                    saveDataAsJson(data)
-                    sendDataToApi(data)
+                data.filter { it -> it.isValid() }.forEach { it ->
+                    saveDataAsJson(it)
+                    sendDataToApi(it)
                 }
             }
         } catch (e: Exception) {

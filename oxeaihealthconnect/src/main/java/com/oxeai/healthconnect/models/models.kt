@@ -2,6 +2,7 @@ package com.oxeai.healthconnect.models
 
 import kotlinx.serialization.Serializable
 import java.time.Instant
+import java.time.ZoneOffset
 import java.util.UUID
 
 enum class DataSource {
@@ -14,7 +15,11 @@ data class TrackedMetric(
     @Serializable(with = InstantSerializer::class)
     val startTime: Instant,
     @Serializable(with = InstantSerializer::class)
-    val endTime: Instant
+    val endTime: Instant,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val startZoneOffset: ZoneOffset?,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val endZoneOffset: ZoneOffset?
 )
 
 @Serializable
@@ -29,7 +34,9 @@ data class TrackedMeasurement(
     val unit: String,
 
     @Serializable(with = InstantSerializer::class)
-    val recordedAt: Instant
+    val recordedAt: Instant,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val timeZoneOffset: ZoneOffset?
 )
 
 @Serializable
@@ -46,79 +53,87 @@ enum class DataConfidence {
 data class IntervalMeasurement(
     @Serializable(with = InstantSerializer::class)
     val startTime: Instant,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val startZoneOffset: ZoneOffset?,
     @Serializable(with = InstantSerializer::class)
     val endTime: Instant,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val endZoneOffset: ZoneOffset?,
     val value: Double,
     val unit: String,
 )
 
 @Serializable
-sealed class BaseHealthData {
+abstract class BaseHealthData {
     abstract val userId: UUID
-
-    @Serializable(with = InstantSerializer::class)
     abstract val timestamp: Instant
     abstract val source: DataSource
     abstract val metadata: Metadata
-
     abstract fun isValid(): Boolean
 }
 
 @Serializable
-abstract class MeasurementData<T>(
+abstract class MeasurementData<T> : BaseHealthData() {
+    abstract val measurements: MutableList<T>
+    override fun isValid(): Boolean {
+        return measurements.isNotEmpty()
+    }
+}
+
+@Serializable
+class StepsData(
     @Serializable(with = UUIDSerializer::class)
     override val userId: UUID,
     @Serializable(with = InstantSerializer::class)
     override val timestamp: Instant,
     override val source: DataSource,
     override val metadata: Metadata,
-    open val measurements: MutableList<T> = ArrayList()
-) : BaseHealthData() {
-    override fun isValid(): Boolean {
-        return measurements.isNotEmpty()
-    }
-}
+    override val measurements: MutableList<TrackedMetric> = ArrayList()
+) : MeasurementData<TrackedMetric>()
 
-
-class StepsData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMetric> = ArrayList()
-) : MeasurementData<TrackedMetric>(userId, timestamp, source, metadata, measurements)
-
+@Serializable
 class DistanceData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<IntervalMeasurement> = ArrayList()
-) : MeasurementData<IntervalMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<IntervalMeasurement> = ArrayList()
+) : MeasurementData<IntervalMeasurement>()
 
+@Serializable
 class ActiveCaloriesData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<IntervalMeasurement> = ArrayList()
-) : MeasurementData<IntervalMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<IntervalMeasurement> = ArrayList()
+) : MeasurementData<IntervalMeasurement>()
 
+@Serializable
 class TotalCaloriesData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<IntervalMeasurement> = ArrayList()
-) : MeasurementData<IntervalMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<IntervalMeasurement> = ArrayList()
+) : MeasurementData<IntervalMeasurement>()
 
+@Serializable
 class FloorsClimbedData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<IntervalMeasurement> = ArrayList()
-) : MeasurementData<IntervalMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<IntervalMeasurement> = ArrayList()
+) : MeasurementData<IntervalMeasurement>()
 
 @Serializable
 data class HeartRateSample(
@@ -127,46 +142,77 @@ data class HeartRateSample(
     val beatsPerMinute: Int
 )
 
+@Serializable
 class HeartRateData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<HeartRateSample> = ArrayList()
-) : MeasurementData<HeartRateSample>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<HeartRateSample> = ArrayList()
+) : MeasurementData<HeartRateSample>()
 
+@Serializable
 class SpeedData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = InstantSerializer::class)
+    val startTime: Instant,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val startZoneOffset: ZoneOffset?,
+    @Serializable(with = InstantSerializer::class)
+    val endTime: Instant,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val endZoneOffset: ZoneOffset?,
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList()
+) : MeasurementData<TrackedMeasurement>()
 
+@Serializable
 class Vo2MaxData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList()
+) : MeasurementData<TrackedMeasurement>()
 
+@Serializable
 class BasalMetabolicRateData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList()
+) : MeasurementData<TrackedMeasurement>()
 
+@Serializable
 class PowerData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList(),
 
+    @Serializable(with = InstantSerializer::class)
+    val startTime: Instant,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val startZoneOffset: ZoneOffset?,
+    @Serializable(with = InstantSerializer::class)
+    val endTime: Instant,
+    @Serializable(with = ZoneOffsetSerializer::class)
+    val endZoneOffset: ZoneOffset?,
+) : MeasurementData<TrackedMeasurement>()
 
 @Serializable
 data class PercentageMeasurement(
@@ -175,45 +221,61 @@ data class PercentageMeasurement(
     val recordedAt: Instant
 )
 
+@Serializable
 class BodyFatData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<PercentageMeasurement> = ArrayList()
-) : MeasurementData<PercentageMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<PercentageMeasurement> = ArrayList()
+) : MeasurementData<PercentageMeasurement>()
 
+@Serializable
 class LeanBodyMassData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList()
+) : MeasurementData<TrackedMeasurement>();
 
+@Serializable
 class WeightData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList()
+) : MeasurementData<TrackedMeasurement>()
 
+@Serializable
 class HeightData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList()
+) : MeasurementData<TrackedMeasurement>()
 
+@Serializable
 class BoneMassData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList()
+) : MeasurementData<TrackedMeasurement>()
+
 @Serializable
 data class BloodPressure(
     val systolic: Double,
@@ -223,53 +285,71 @@ data class BloodPressure(
     val recordedAt: Instant
 )
 
+@Serializable
 class BloodPressureData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<BloodPressure> = ArrayList()
-) : MeasurementData<BloodPressure>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<BloodPressure> = ArrayList()
+) : MeasurementData<BloodPressure>()
 
+@Serializable
 class BloodGlucoseData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<BloodGlucoseReading> = ArrayList()
-) : MeasurementData<BloodGlucoseReading>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<BloodGlucoseReading> = ArrayList()
+) : MeasurementData<BloodGlucoseReading>()
 
+@Serializable
 class BodyTemperatureData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TemperatureReading> = ArrayList()
-) : MeasurementData<TemperatureReading>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TemperatureReading> = ArrayList()
+) : MeasurementData<TemperatureReading>()
 
+@Serializable
 class OxygenSaturationData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<PercentageMeasurement> = ArrayList()
-) : MeasurementData<PercentageMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<PercentageMeasurement> = ArrayList()
+) : MeasurementData<PercentageMeasurement>()
 
+@Serializable
 class RespiratoryRateData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TrackedMeasurement> = ArrayList()
-) : MeasurementData<TrackedMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TrackedMeasurement> = ArrayList()
+) : MeasurementData<TrackedMeasurement>()
 
+@Serializable
 class HydrationData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<IntervalMeasurement> = ArrayList()
-) : MeasurementData<IntervalMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<IntervalMeasurement> = ArrayList()
+) : MeasurementData<IntervalMeasurement>()
 
 @Serializable
 data class SleepSession(
@@ -280,14 +360,16 @@ data class SleepSession(
     val stage: SleepStage
 )
 
-
+@Serializable
 class SleepSessionData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<SleepSession> = ArrayList()
-) : MeasurementData<SleepSession>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<SleepSession> = ArrayList()
+) : MeasurementData<SleepSession>()
 
 enum class Flow {
     Unknown,
@@ -303,13 +385,16 @@ data class FlowMeasurement(
     var flow: Flow
 )
 
+@Serializable
 class MenstruationData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<FlowMeasurement> = ArrayList()
-) : MeasurementData<FlowMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<FlowMeasurement> = ArrayList()
+) : MeasurementData<FlowMeasurement>()
 
 @Serializable
 data class TimeMeasurement(
@@ -317,13 +402,16 @@ data class TimeMeasurement(
     val time: Instant,
 )
 
+@Serializable
 class IntermenstrualBleedingData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<TimeMeasurement> = ArrayList()
-) : MeasurementData<TimeMeasurement>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<TimeMeasurement> = ArrayList()
+) : MeasurementData<TimeMeasurement>()
 
 
 @Serializable
@@ -544,13 +632,16 @@ data class ExerciseRouteLocation(
     val speed: SimpleMeasurement? = null
 )
 
+@Serializable
 class ExerciseData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<Exercise> = ArrayList()
-) : MeasurementData<Exercise>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<Exercise> = ArrayList()
+) : MeasurementData<Exercise>()
 
 @Serializable
 class Nutrition(
@@ -647,13 +738,16 @@ class Nutrition(
     val mealType: MealType,
 )
 
+@Serializable
 class NutritionData(
-    userId: UUID,
-    timestamp: Instant,
-    source: DataSource,
-    metadata: Metadata,
-    measurements: MutableList<Nutrition> = ArrayList()
-) : MeasurementData<Nutrition>(userId, timestamp, source, metadata, measurements)
+    @Serializable(with = UUIDSerializer::class)
+    override val userId: UUID,
+    @Serializable(with = InstantSerializer::class)
+    override val timestamp: Instant,
+    override val source: DataSource,
+    override val metadata: Metadata,
+    override val measurements: MutableList<Nutrition> = ArrayList()
+) : MeasurementData<Nutrition>()
 
 
 enum class SleepStage(val value: Int, val displayName: String) {

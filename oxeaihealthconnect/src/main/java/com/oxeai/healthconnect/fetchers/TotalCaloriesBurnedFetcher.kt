@@ -13,14 +13,10 @@ import java.util.UUID
 class TotalCaloriesBurnedFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<TotalCaloriesBurnedRecord>(context, userId, TotalCaloriesBurnedRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<TotalCaloriesBurnedRecord>): TotalCaloriesData {
+    override fun processRecords(response: ReadRecordsResponse<TotalCaloriesBurnedRecord>): List<TotalCaloriesData> {
         val totalCaloriesData = TotalCaloriesData(
-            userId = userId,
-            timestamp = endTime,
-            source = DataSource.GOOGLE,
-            metadata = Metadata(
-                devices = getDeviceModels(response),
-                confidence = DataConfidence.HIGH
+            userId = userId, timestamp = endTime, source = DataSource.GOOGLE, metadata = Metadata(
+                devices = getDeviceModels(response), confidence = DataConfidence.HIGH
             )
         )
         response.records.filter { record -> record.energy.inJoules > 0 }.forEach { record ->
@@ -30,9 +26,11 @@ class TotalCaloriesBurnedFetcher(context: Context, userId: UUID) :
                     unit = "J",
                     startTime = record.startTime,
                     endTime = record.endTime,
+                    startZoneOffset = record.startZoneOffset,
+                    endZoneOffset = record.endZoneOffset
                 ),
             )
         }
-        return totalCaloriesData
+        return listOf(totalCaloriesData)
     }
 }

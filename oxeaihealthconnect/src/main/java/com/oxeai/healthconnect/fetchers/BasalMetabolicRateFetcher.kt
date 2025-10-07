@@ -13,7 +13,7 @@ import java.util.UUID
 class BasalMetabolicRateFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<BasalMetabolicRateRecord>(context, userId, BasalMetabolicRateRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<BasalMetabolicRateRecord>): BasalMetabolicRateData {
+    override fun processRecords(response: ReadRecordsResponse<BasalMetabolicRateRecord>): List<BasalMetabolicRateData> {
         val basalMetabolicRateData = BasalMetabolicRateData(
             userId = userId,
             timestamp = endTime,
@@ -29,10 +29,11 @@ class BasalMetabolicRateFetcher(context: Context, userId: UUID) :
                 TrackedMeasurement(
                     value = record.basalMetabolicRate.inWatts,
                     unit = "w",
-                    recordedAt = record.time
+                    recordedAt = record.time,
+                    timeZoneOffset = record.zoneOffset
                 )
             )
         }
-        return basalMetabolicRateData
+        return listOf(basalMetabolicRateData)
     }
 }

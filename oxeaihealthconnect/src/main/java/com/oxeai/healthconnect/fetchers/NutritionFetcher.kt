@@ -14,7 +14,7 @@ import java.util.UUID
 class NutritionFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<NutritionRecord>(context, userId, NutritionRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<NutritionRecord>): NutritionData {
+    override fun processRecords(response: ReadRecordsResponse<NutritionRecord>): List<NutritionData> {
         val nutritionData = NutritionData(
             userId = userId,
             timestamp = endTime,
@@ -76,6 +76,6 @@ class NutritionFetcher(context: Context, userId: UUID) :
                 )
             )
         }
-        return nutritionData
+        return listOf(nutritionData)
     }
 }

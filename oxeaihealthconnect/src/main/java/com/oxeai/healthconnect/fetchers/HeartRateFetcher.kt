@@ -12,7 +12,7 @@ import java.util.UUID
 
 class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher<HeartRateRecord>(context, userId, HeartRateRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<HeartRateRecord>): HeartRateData {
+    override fun processRecords(response: ReadRecordsResponse<HeartRateRecord>): List<HeartRateData> {
         val heartRateData = HeartRateData(
             userId = userId,
             timestamp = endTime,
@@ -32,6 +32,6 @@ class HeartRateFetcher(context: Context, userId: UUID) : HealthDataFetcher<Heart
                 )
             }
         }
-        return heartRateData
+        return listOf(heartRateData)
     }
 }

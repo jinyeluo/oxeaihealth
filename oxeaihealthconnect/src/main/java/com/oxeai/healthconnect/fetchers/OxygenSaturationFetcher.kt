@@ -12,7 +12,7 @@ import java.util.UUID
 
 class OxygenSaturationFetcher(context: Context, userId: UUID) : HealthDataFetcher<OxygenSaturationRecord>(context, userId, OxygenSaturationRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<OxygenSaturationRecord>): OxygenSaturationData {
+    override fun processRecords(response: ReadRecordsResponse<OxygenSaturationRecord>): List<OxygenSaturationData> {
         val oxygenSaturationData = OxygenSaturationData(
             userId = userId,
             timestamp = endTime,
@@ -30,6 +30,6 @@ class OxygenSaturationFetcher(context: Context, userId: UUID) : HealthDataFetche
                 )
             )
         }
-        return oxygenSaturationData
+        return listOf(oxygenSaturationData)
     }
 }

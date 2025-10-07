@@ -12,7 +12,7 @@ import java.util.UUID
 
 class RespiratoryRateFetcher(context: Context, userId: UUID) : HealthDataFetcher<RespiratoryRateRecord>(context, userId, RespiratoryRateRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<RespiratoryRateRecord>): RespiratoryRateData {
+    override fun processRecords(response: ReadRecordsResponse<RespiratoryRateRecord>): List<RespiratoryRateData> {
         val respiratoryRateData = RespiratoryRateData(
             userId = userId,
             timestamp = endTime,
@@ -27,10 +27,11 @@ class RespiratoryRateFetcher(context: Context, userId: UUID) : HealthDataFetcher
                 TrackedMeasurement(
                     value = record.rate,
                     unit = "breaths per minute",
-                    recordedAt = record.time
+                    recordedAt = record.time,
+                    timeZoneOffset = record.zoneOffset
                 )
             )
         }
-        return respiratoryRateData
+        return listOf(respiratoryRateData)
     }
 }

@@ -12,7 +12,7 @@ import java.util.UUID
 
 class StepsFetcher(context: Context, userId: UUID) : HealthDataFetcher<StepsRecord>(context, userId, StepsRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<StepsRecord>): StepsData {
+    override fun processRecords(response: ReadRecordsResponse<StepsRecord>): List<StepsData> {
         val stepsData = StepsData(
             userId = userId,
             timestamp = endTime,
@@ -27,10 +27,12 @@ class StepsFetcher(context: Context, userId: UUID) : HealthDataFetcher<StepsReco
                 TrackedMetric(
                     count = record.count.toInt(),
                     startTime = record.startTime,
-                    endTime = record.endTime
+                    endTime = record.endTime,
+                    startZoneOffset = record.startZoneOffset,
+                    endZoneOffset = record.endZoneOffset
                 )
             )
         }
-        return stepsData
+        return listOf(stepsData)
     }
 }

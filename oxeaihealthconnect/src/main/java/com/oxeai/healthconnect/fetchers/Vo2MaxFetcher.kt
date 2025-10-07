@@ -12,7 +12,7 @@ import java.util.UUID
 
 class Vo2MaxFetcher(context: Context, userId: UUID) : HealthDataFetcher<Vo2MaxRecord>(context, userId, Vo2MaxRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<Vo2MaxRecord>): Vo2MaxData {
+    override fun processRecords(response: ReadRecordsResponse<Vo2MaxRecord>): List<Vo2MaxData> {
         val vo2MaxData = Vo2MaxData(
             userId = userId,
             timestamp = endTime,
@@ -27,10 +27,11 @@ class Vo2MaxFetcher(context: Context, userId: UUID) : HealthDataFetcher<Vo2MaxRe
                 TrackedMeasurement(
                     value = record.vo2MillilitersPerMinuteKilogram,
                     unit = "ml/min/kg",
-                    recordedAt = record.time
+                    recordedAt = record.time,
+                    timeZoneOffset = record.zoneOffset
                 )
             )
         }
-        return vo2MaxData
+        return listOf(vo2MaxData)
     }
 }

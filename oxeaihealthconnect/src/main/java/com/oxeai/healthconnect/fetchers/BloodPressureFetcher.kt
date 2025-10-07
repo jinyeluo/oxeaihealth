@@ -13,7 +13,7 @@ import java.util.UUID
 class BloodPressureFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<BloodPressureRecord>(context, userId, BloodPressureRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<BloodPressureRecord>): BloodPressureData {
+    override fun processRecords(response: ReadRecordsResponse<BloodPressureRecord>): List<BloodPressureData> {
         val bloodPressureData = BloodPressureData(
             userId = userId,
             timestamp = endTime,
@@ -34,6 +34,6 @@ class BloodPressureFetcher(context: Context, userId: UUID) :
                 ),
             )
         }
-        return bloodPressureData
+        return listOf(bloodPressureData)
     }
 }

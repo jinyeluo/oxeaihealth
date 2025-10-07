@@ -15,7 +15,7 @@ import java.util.UUID
 class ExerciseSessionFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<ExerciseSessionRecord>(context, userId, ExerciseSessionRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<ExerciseSessionRecord>): ExerciseData {
+    override fun processRecords(response: ReadRecordsResponse<ExerciseSessionRecord>): List<ExerciseData> {
         val exerciseData = ExerciseData(
             userId = userId,
             timestamp = endTime,
@@ -57,7 +57,7 @@ class ExerciseSessionFetcher(context: Context, userId: UUID) :
                 )
             )
         }
-        return exerciseData
+        return listOf(exerciseData)
     }
 
     companion object {

@@ -13,7 +13,7 @@ import java.util.UUID
 class IntermenstrualBleedingFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<IntermenstrualBleedingRecord>(context, userId, IntermenstrualBleedingRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<IntermenstrualBleedingRecord>): IntermenstrualBleedingData {
+    override fun processRecords(response: ReadRecordsResponse<IntermenstrualBleedingRecord>): List<IntermenstrualBleedingData> {
         val intermenstrualBleedingData = IntermenstrualBleedingData(
             userId = userId,
             timestamp = endTime,
@@ -30,6 +30,6 @@ class IntermenstrualBleedingFetcher(context: Context, userId: UUID) :
                 )
             )
         }
-        return intermenstrualBleedingData
+        return listOf(intermenstrualBleedingData)
     }
 }

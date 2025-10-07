@@ -12,7 +12,7 @@ import java.util.UUID
 
 class HydrationFetcher(context: Context, userId: UUID) : HealthDataFetcher<HydrationRecord>(context, userId, HydrationRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<HydrationRecord>): HydrationData {
+    override fun processRecords(response: ReadRecordsResponse<HydrationRecord>): List<HydrationData> {
         val hydrationData = HydrationData(
             userId = userId,
             timestamp = endTime,
@@ -28,10 +28,11 @@ class HydrationFetcher(context: Context, userId: UUID) : HealthDataFetcher<Hydra
                     value = record.volume.inLiters,
                     unit = "l",
                     startTime = record.startTime,
-                    endTime = record.endTime
+                    endTime = record.endTime, startZoneOffset = record.startZoneOffset,
+                    endZoneOffset = record.endZoneOffset
                 )
             )
         }
-        return hydrationData
+        return listOf(hydrationData)
     }
 }

@@ -19,7 +19,7 @@ import java.util.UUID
 
 class SleepSessionFetcher(context: Context, userId: UUID) : HealthDataFetcher<SleepSessionRecord>(context, userId, SleepSessionRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<SleepSessionRecord>): SleepSessionData {
+    override fun processRecords(response: ReadRecordsResponse<SleepSessionRecord>): List<SleepSessionData> {
         val sleepSessionData = SleepSessionData(
             userId = userId,
             timestamp = endTime,
@@ -40,7 +40,7 @@ class SleepSessionFetcher(context: Context, userId: UUID) : HealthDataFetcher<Sl
                 )
             }
         }
-        return sleepSessionData
+        return listOf(sleepSessionData)
     }
 
     companion object {

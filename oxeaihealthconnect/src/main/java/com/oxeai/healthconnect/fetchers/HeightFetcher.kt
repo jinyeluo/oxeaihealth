@@ -12,7 +12,7 @@ import java.util.UUID
 
 class HeightFetcher(context: Context, userId: UUID) : HealthDataFetcher<HeightRecord>(context, userId, HeightRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<HeightRecord>): HeightData {
+    override fun processRecords(response: ReadRecordsResponse<HeightRecord>): List<HeightData> {
         val heightData = HeightData(
             userId = userId,
             timestamp = endTime,
@@ -27,11 +27,12 @@ class HeightFetcher(context: Context, userId: UUID) : HealthDataFetcher<HeightRe
                 TrackedMeasurement(
                     value = record.height.inMeters,
                     unit = "m",
-                    recordedAt = record.time
+                    recordedAt = record.time,
+                    timeZoneOffset = record.zoneOffset
                 )
             )
         }
-        return heightData
+        return listOf(heightData)
     }
 }
 

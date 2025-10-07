@@ -12,7 +12,7 @@ import java.util.UUID
 
 class BodyTemperatureFetcher(context: Context, userId: UUID) : HealthDataFetcher<BodyTemperatureRecord>(context, userId, BodyTemperatureRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<BodyTemperatureRecord>): BodyTemperatureData {
+    override fun processRecords(response: ReadRecordsResponse<BodyTemperatureRecord>): List<BodyTemperatureData> {
         val bodyTemperatureData = BodyTemperatureData(
             userId = userId,
             timestamp = endTime,
@@ -32,6 +32,6 @@ class BodyTemperatureFetcher(context: Context, userId: UUID) : HealthDataFetcher
                 )
             )
         }
-        return bodyTemperatureData
+        return listOf(bodyTemperatureData)
     }
 }

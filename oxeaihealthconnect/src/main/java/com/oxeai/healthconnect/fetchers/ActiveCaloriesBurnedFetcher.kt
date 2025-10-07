@@ -13,7 +13,7 @@ import java.util.UUID
 class ActiveCaloriesBurnedFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<ActiveCaloriesBurnedRecord>(context, userId, ActiveCaloriesBurnedRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<ActiveCaloriesBurnedRecord>): ActiveCaloriesData {
+    override fun processRecords(response: ReadRecordsResponse<ActiveCaloriesBurnedRecord>): List<ActiveCaloriesData> {
         val activeCaloriesData = ActiveCaloriesData(
             userId = userId,
             timestamp = endTime,
@@ -30,9 +30,11 @@ class ActiveCaloriesBurnedFetcher(context: Context, userId: UUID) :
                     unit = "J",
                     startTime = record.startTime,
                     endTime = record.endTime,
+                    startZoneOffset = record.startZoneOffset,
+                    endZoneOffset = record.endZoneOffset
                 ),
             )
         }
-        return activeCaloriesData
+        return listOf(activeCaloriesData)
     }
 }

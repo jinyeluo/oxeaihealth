@@ -13,7 +13,7 @@ import com.oxeai.healthconnect.models.RelationToMeal
 import java.util.UUID
 
 class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher<BloodGlucoseRecord>(context, userId, BloodGlucoseRecord::class) {
-    override fun processRecords(response: ReadRecordsResponse<BloodGlucoseRecord>): BloodGlucoseData {
+    override fun processRecords(response: ReadRecordsResponse<BloodGlucoseRecord>): List<BloodGlucoseData> {
         val bloodGlucoseData = BloodGlucoseData(
             userId = userId,
             timestamp = endTime,
@@ -35,7 +35,7 @@ class BloodGlucoseFetcher(context: Context, userId: UUID) : HealthDataFetcher<Bl
                 )
             )
         }
-        return bloodGlucoseData
+        return listOf(bloodGlucoseData)
     }
 
     companion object {

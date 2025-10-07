@@ -14,7 +14,7 @@ import java.util.UUID
 class MenstruationFetcher(context: Context, userId: UUID) :
     HealthDataFetcher<MenstruationFlowRecord>(context, userId, MenstruationFlowRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<MenstruationFlowRecord>): MenstruationData {
+    override fun processRecords(response: ReadRecordsResponse<MenstruationFlowRecord>): List<MenstruationData> {
         val menstruationData = MenstruationData(
             userId = userId,
             timestamp = endTime,
@@ -32,7 +32,7 @@ class MenstruationFetcher(context: Context, userId: UUID) :
                 )
             )
         }
-        return menstruationData
+        return listOf(menstruationData)
     }
 
     companion object {

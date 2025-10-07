@@ -12,7 +12,7 @@ import java.util.UUID
 
 class DistanceFetcher(context: Context, userId: UUID) : HealthDataFetcher<DistanceRecord>(context, userId, DistanceRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<DistanceRecord>): DistanceData {
+    override fun processRecords(response: ReadRecordsResponse<DistanceRecord>): List<DistanceData> {
         val distanceData = DistanceData(
             userId = userId,
             timestamp = endTime,
@@ -28,10 +28,12 @@ class DistanceFetcher(context: Context, userId: UUID) : HealthDataFetcher<Distan
                     value = record.distance.inMeters,
                     unit = "m",
                     startTime = record.startTime,
-                    endTime = record.endTime
+                    endTime = record.endTime, startZoneOffset = record.startZoneOffset,
+                    endZoneOffset = record.endZoneOffset
+
                 )
             )
         }
-        return distanceData
+        return listOf(distanceData)
     }
 }

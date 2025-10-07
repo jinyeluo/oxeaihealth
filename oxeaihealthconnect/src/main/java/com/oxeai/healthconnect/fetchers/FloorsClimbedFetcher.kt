@@ -12,7 +12,7 @@ import java.util.UUID
 
 class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher<FloorsClimbedRecord>(context, userId, FloorsClimbedRecord::class) {
 
-    override fun processRecords(response: ReadRecordsResponse<FloorsClimbedRecord>): FloorsClimbedData {
+    override fun processRecords(response: ReadRecordsResponse<FloorsClimbedRecord>): List<FloorsClimbedData> {
         val floorsClimbedData = FloorsClimbedData(
             userId = userId,
             timestamp = endTime,
@@ -28,10 +28,11 @@ class FloorsClimbedFetcher(context: Context, userId: UUID) : HealthDataFetcher<F
                     value = record.floors,
                     unit = "floor",
                     startTime = record.startTime,
-                    endTime = record.endTime
+                    endTime = record.endTime, startZoneOffset = record.startZoneOffset,
+                    endZoneOffset = record.endZoneOffset
                 )
             )
         }
-        return floorsClimbedData
+        return listOf(floorsClimbedData)
     }
 }
